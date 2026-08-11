@@ -11,7 +11,7 @@ export default async function LandingPage() {
     <div className="flex min-h-screen flex-col items-center justify-center bg-zinc-50 px-4 py-24 dark:bg-black">
       <main className="flex w-full max-w-xl flex-col items-center gap-6 text-center">
         <span className="rounded-full bg-zinc-200 px-3 py-1 text-xs font-medium text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400">
-          정치 뉴스 분석 서비스
+          정치 뉴스를 올바르게, 정치한스푼
         </span>
 
         <h1 className="text-3xl font-bold text-zinc-900 dark:text-zinc-50">
@@ -19,8 +19,8 @@ export default async function LandingPage() {
         </h1>
 
         <p className="text-zinc-600 dark:text-zinc-400">
-          매일 하나의 정치 이슈를 골라 여당·야당의 논리를 나란히 비교합니다. 자체 지식이 아닌
-          검증된 공식 논평·뉴스만 근거로 요약하고, 모든 문장에는 원문 출처를 표기합니다.
+          매일 하나의 정치 이슈를 골라 여당·야당의 논리를 나란히 비교합니다. 검증된 공식
+          논평·뉴스만 근거로 요약합니다.
         </p>
 
         <ul className="flex flex-col gap-2 text-left text-sm text-zinc-600 dark:text-zinc-400">
