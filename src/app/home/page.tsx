@@ -1,4 +1,6 @@
 import { SummaryCardView } from "@/components/SummaryCard";
+import { DailyCardSlider } from "@/components/DailyCardSlider";
+import { ReviewPromptPopup } from "@/components/ReviewPromptPopup";
 import { dummySummaryCard } from "@/lib/dummy-data";
 import { getLatestSummaryCard } from "@/lib/supabase/queries";
 
@@ -19,8 +21,11 @@ export default async function Home() {
             Supabase에서 데이터를 가져오지 못해 샘플 데이터를 표시 중입니다. (schema.sql / seed.sql 적용 여부 확인)
           </p>
         )}
-        <SummaryCardView card={card} />
+        <DailyCardSlider>
+          <SummaryCardView card={card} />
+        </DailyCardSlider>
       </main>
+      <ReviewPromptPopup />
     </div>
   );
 }

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, type FormEvent } from "react";
 import { createClient } from "@/lib/supabase/browser";
+import { SocialLoginButtons } from "@/components/SocialLoginButtons";
 
 export default function SignupPage() {
   const router = useRouter();
@@ -115,6 +116,10 @@ export default function SignupPage() {
             {loading ? "가입 중..." : "가입하기"}
           </button>
         </form>
+
+        <div className="mt-4">
+          <SocialLoginButtons />
+        </div>
 
         <p className="mt-4 text-sm text-zinc-500 dark:text-zinc-400">
           이미 계정이 있으신가요?{" "}

@@ -14,6 +14,7 @@ export type MemberBill = {
   status: string;
   proposedDate: string;
   role: "대표발의" | "공동발의";
+  assemblyBillId: string | null;
 };
 
 export type MemberVote = {
@@ -22,6 +23,7 @@ export type MemberVote = {
   billTitle: string;
   result: string;
   votedAt: string;
+  assemblyBillId: string | null;
 };
 
 export type MemberDetail = MemberListItem & {

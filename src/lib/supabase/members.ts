@@ -52,16 +52,16 @@ export async function getMemberDetail(id: string): Promise<MemberDetail | null> 
   const [{ data: sponsored }, { data: coSponsoredRows }, { data: voteRows }] = await Promise.all([
     supabase
       .from("bills")
-      .select("id, title, status, proposed_date")
+      .select("id, title, status, proposed_date, assembly_bill_id")
       .eq("main_sponsor_id", id)
       .order("proposed_date", { ascending: false }),
     supabase
       .from("bill_sponsors")
-      .select("bills(id, title, status, proposed_date)")
+      .select("bills(id, title, status, proposed_date, assembly_bill_id)")
       .eq("member_id", id),
     supabase
       .from("votes")
-      .select("id, result, voted_at, bills(id, title)")
+      .select("id, result, voted_at, bills(id, title, assembly_bill_id)")
       .eq("member_id", id)
       .order("voted_at", { ascending: false }),
   ]);
@@ -72,6 +72,7 @@ export async function getMemberDetail(id: string): Promise<MemberDetail | null> 
     status: b.status,
     proposedDate: b.proposed_date,
     role: "대표발의",
+    assemblyBillId: b.assembly_bill_id,
   }));
 
   const coSponsoredBills: MemberBill[] = (coSponsoredRows ?? [])
@@ -84,6 +85,7 @@ export async function getMemberDetail(id: string): Promise<MemberDetail | null> 
         status: bill.status,
         proposedDate: bill.proposed_date,
         role: "공동발의",
+        assemblyBillId: bill.assembly_bill_id,
       };
       return b;
     })
@@ -99,6 +101,7 @@ export async function getMemberDetail(id: string): Promise<MemberDetail | null> 
         billTitle: bill.title,
         result: row.result,
         votedAt: row.voted_at,
+        assemblyBillId: bill.assembly_bill_id,
       };
       return v;
     })

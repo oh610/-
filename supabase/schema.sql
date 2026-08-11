@@ -333,3 +333,32 @@ alter table users add column if not exists nickname text;
 -- ========================================
 
 alter type subscription_plan add value if not exists '자율';
+
+-- ========================================
+-- 이용자 후기
+-- ========================================
+
+create table reviews (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid references users(id) on delete set null,
+  display_name text not null,
+  content text not null check (char_length(content) between 1 and 300),
+  approved boolean not null default true,
+  created_at timestamptz not null default now()
+);
+create index idx_reviews_approved on reviews(approved);
+
+alter table reviews enable row level security;
+
+create policy "public read approved reviews" on reviews for select using (approved = true);
+create policy "user insert own review" on reviews for insert with check (auth.uid() = user_id);
+
+grant select on reviews to anon, authenticated;
+grant insert on reviews to authenticated;
+grant all on reviews to service_role;
+
+-- ========================================
+-- 발의 법안/표결 이력 → 국회 의안정보시스템 원문 링크
+-- ========================================
+
+alter table bills add column if not exists assembly_bill_id text;

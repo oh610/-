@@ -4,6 +4,8 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, type FormEvent } from "react";
 import { createClient } from "@/lib/supabase/browser";
+import { SocialLoginButtons } from "@/components/SocialLoginButtons";
+import { ReviewCarousel } from "@/components/ReviewCarousel";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -74,6 +76,10 @@ export default function LoginPage() {
           </button>
         </form>
 
+        <div className="mt-4">
+          <SocialLoginButtons />
+        </div>
+
         <p className="mt-3 text-sm text-zinc-500 dark:text-zinc-400">
           <Link href="/forgot-password" className="text-zinc-900 hover:underline dark:text-zinc-100">
             비밀번호를 잊으셨나요?
@@ -87,6 +93,10 @@ export default function LoginPage() {
           </Link>
         </p>
       </main>
+
+      <div className="mt-12 w-full">
+        <ReviewCarousel />
+      </div>
     </div>
   );
 }

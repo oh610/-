@@ -63,6 +63,9 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
           <Link href="/guide" className="text-amber-50 hover:text-white hover:underline">
             사용 방법
           </Link>
+          <Link href="/contact" className="text-amber-50 hover:text-white hover:underline">
+            문의
+          </Link>
           <AuthNav userEmail={user?.email ?? null} nickname={nickname} />
         </nav>
         {showAd && (
@@ -78,9 +81,9 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
           <Link href="/privacy" className="hover:underline">
             개인정보처리방침
           </Link>
-          <a href="mailto:dhaostk@gmail.com" className="hover:underline">
-            문의: dhaostk@gmail.com
-          </a>
+          <Link href="/contact" className="hover:underline">
+            문의
+          </Link>
         </footer>
       </body>
     </html>

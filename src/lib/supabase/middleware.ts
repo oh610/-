@@ -30,7 +30,16 @@ export async function updateSession(request: NextRequest) {
 
   const path = request.nextUrl.pathname;
   const isAuthPage = path === "/login" || path === "/signup";
-  const publicOnlyPaths = ["/", "/forgot-password", "/reset-password", "/terms", "/privacy", "/pricing", "/guide"];
+  const publicOnlyPaths = [
+    "/",
+    "/forgot-password",
+    "/reset-password",
+    "/terms",
+    "/privacy",
+    "/pricing",
+    "/guide",
+    "/contact",
+  ];
   const isPublicPage =
     isAuthPage ||
     publicOnlyPaths.includes(path) ||

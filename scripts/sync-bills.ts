@@ -55,6 +55,7 @@ async function main() {
           proposer_party_id: sponsor?.current_party_id ?? null,
           status,
           proposed_date: row.PROPOSE_DT,
+          assembly_bill_id: row.BILL_ID,
         },
         { onConflict: "bill_no" },
       )

@@ -119,14 +119,33 @@ export default async function MemberDetailPage({
             <p className="text-sm text-zinc-500 dark:text-zinc-400">발의한 법안이 없습니다.</p>
           ) : (
             <ul className="flex flex-col gap-2">
-              {member.bills.map((b) => (
-                <li key={`${b.role}-${b.id}`} className="flex items-center justify-between gap-3 text-sm">
-                  <span className="min-w-0 text-zinc-800 dark:text-zinc-200">{b.title}</span>
-                  <span className="shrink-0 whitespace-nowrap text-zinc-500 dark:text-zinc-400">
-                    {b.role} · {b.status} · {b.proposedDate}
-                  </span>
-                </li>
-              ))}
+              {member.bills.map((b) =>
+                b.assemblyBillId ? (
+                  <li key={`${b.role}-${b.id}`}>
+                    <a
+                      href={`https://likms.assembly.go.kr/bill/billDetail.do?billId=${b.assemblyBillId}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center justify-between gap-3 text-sm hover:underline"
+                    >
+                      <span className="min-w-0 text-zinc-800 dark:text-zinc-200">{b.title}</span>
+                      <span className="shrink-0 whitespace-nowrap text-zinc-500 dark:text-zinc-400">
+                        {b.role} · {b.status} · {b.proposedDate}
+                      </span>
+                    </a>
+                  </li>
+                ) : (
+                  <li
+                    key={`${b.role}-${b.id}`}
+                    className="flex items-center justify-between gap-3 text-sm"
+                  >
+                    <span className="min-w-0 text-zinc-800 dark:text-zinc-200">{b.title}</span>
+                    <span className="shrink-0 whitespace-nowrap text-zinc-500 dark:text-zinc-400">
+                      {b.role} · {b.status} · {b.proposedDate}
+                    </span>
+                  </li>
+                ),
+              )}
             </ul>
           )}
         </section>
@@ -137,12 +156,26 @@ export default async function MemberDetailPage({
             <p className="text-sm text-zinc-500 dark:text-zinc-400">표결 이력이 없습니다.</p>
           ) : (
             <ul className="flex flex-col gap-2">
-              {member.votes.map((v) => (
-                <li key={v.id} className="flex items-center justify-between gap-3 text-sm">
-                  <span className="min-w-0 text-zinc-800 dark:text-zinc-200">{v.billTitle}</span>
-                  <VoteResultBadge result={v.result} />
-                </li>
-              ))}
+              {member.votes.map((v) =>
+                v.assemblyBillId ? (
+                  <li key={v.id}>
+                    <a
+                      href={`https://likms.assembly.go.kr/bill/billDetail.do?billId=${v.assemblyBillId}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center justify-between gap-3 text-sm hover:underline"
+                    >
+                      <span className="min-w-0 text-zinc-800 dark:text-zinc-200">{v.billTitle}</span>
+                      <VoteResultBadge result={v.result} />
+                    </a>
+                  </li>
+                ) : (
+                  <li key={v.id} className="flex items-center justify-between gap-3 text-sm">
+                    <span className="min-w-0 text-zinc-800 dark:text-zinc-200">{v.billTitle}</span>
+                    <VoteResultBadge result={v.result} />
+                  </li>
+                ),
+              )}
             </ul>
           )}
         </section>
