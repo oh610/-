@@ -3,19 +3,17 @@
 import { useState } from "react";
 import { createClient } from "@/lib/supabase/browser";
 
+// 카카오는 Supabase의 카카오 프로바이더가 account_email 동의항목을 강제로 요청하는데,
+// 저희 카카오 앱은 비즈 인증 전이라 그 항목이 없어 KOE205 에러가 남 (비즈 인증 후 다시 노출 예정).
 export function SocialLoginButtons() {
-  const [loading, setLoading] = useState<"google" | "kakao" | null>(null);
+  const [loading, setLoading] = useState<"google" | null>(null);
 
-  async function handleOAuth(provider: "google" | "kakao") {
+  async function handleOAuth(provider: "google") {
     setLoading(provider);
     const supabase = createClient();
     await supabase.auth.signInWithOAuth({
       provider,
-      options: {
-        redirectTo: `${window.location.origin}/auth/callback`,
-        // 카카오 앱이 비즈 인증 전이라 account_email 권한이 없음 — Supabase 기본 스코프에서 제외.
-        ...(provider === "kakao" ? { scopes: "profile_nickname profile_image" } : {}),
-      },
+      options: { redirectTo: `${window.location.origin}/auth/callback` },
     });
   }
 
@@ -34,15 +32,6 @@ export function SocialLoginButtons() {
         className="flex items-center justify-center gap-2 rounded-lg border border-zinc-300 bg-white px-4 py-2 text-sm font-medium text-zinc-700 disabled:opacity-50 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-200"
       >
         {loading === "google" ? "이동 중..." : "Google로 계속하기"}
-      </button>
-
-      <button
-        type="button"
-        onClick={() => handleOAuth("kakao")}
-        disabled={loading !== null}
-        className="flex items-center justify-center gap-2 rounded-lg bg-[#FEE500] px-4 py-2 text-sm font-medium text-[#191919] disabled:opacity-50"
-      >
-        {loading === "kakao" ? "이동 중..." : "카카오로 계속하기"}
       </button>
     </div>
   );
