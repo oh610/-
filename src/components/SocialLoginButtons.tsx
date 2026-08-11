@@ -11,7 +11,11 @@ export function SocialLoginButtons() {
     const supabase = createClient();
     await supabase.auth.signInWithOAuth({
       provider,
-      options: { redirectTo: `${window.location.origin}/auth/callback` },
+      options: {
+        redirectTo: `${window.location.origin}/auth/callback`,
+        // 카카오 앱이 비즈 인증 전이라 account_email 권한이 없음 — Supabase 기본 스코프에서 제외.
+        ...(provider === "kakao" ? { scopes: "profile_nickname profile_image" } : {}),
+      },
     });
   }
 
