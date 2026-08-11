@@ -4,9 +4,9 @@ import { useRouter } from "next/navigation";
 import { useState, type FormEvent } from "react";
 import { getPaddle } from "@/lib/paddle/browser";
 
-export function DonateForm({ userId }: { userId: string | null }) {
+export function CustomSubscribeForm({ userId }: { userId: string | null }) {
   const router = useRouter();
-  const [amount, setAmount] = useState("10000");
+  const [amount, setAmount] = useState("5000");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -27,14 +27,14 @@ export function DonateForm({ userId }: { userId: string | null }) {
 
     setLoading(true);
     try {
-      const res = await fetch("/api/paddle/donate", {
+      const res = await fetch("/api/paddle/subscribe-custom", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ amount: value }),
       });
       const data = await res.json();
       if (!res.ok) {
-        setError(data.error ?? "후원 요청에 실패했습니다.");
+        setError(data.error ?? "구독 요청에 실패했습니다.");
         return;
       }
 
@@ -50,7 +50,7 @@ export function DonateForm({ userId }: { userId: string | null }) {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-wrap items-center gap-2">
+    <form onSubmit={handleSubmit} className="flex flex-col gap-2">
       <label className="flex items-center rounded-lg border border-zinc-300 px-3 py-2 dark:border-zinc-700">
         <input
           type="number"
@@ -58,18 +58,18 @@ export function DonateForm({ userId }: { userId: string | null }) {
           step={1000}
           value={amount}
           onChange={(e) => setAmount(e.target.value)}
-          className="w-28 bg-transparent text-sm text-zinc-900 outline-none dark:text-zinc-100"
+          className="w-full bg-transparent text-sm text-zinc-900 outline-none dark:text-zinc-100"
         />
-        <span className="ml-1 text-sm text-zinc-500 dark:text-zinc-400">원</span>
+        <span className="ml-1 shrink-0 text-sm text-zinc-500 dark:text-zinc-400">원 / 월</span>
       </label>
       <button
         type="submit"
         disabled={loading}
-        className="rounded-lg border border-zinc-300 px-4 py-2 text-sm text-zinc-700 disabled:opacity-50 dark:border-zinc-700 dark:text-zinc-300"
+        className="w-full rounded-lg bg-zinc-900 px-4 py-2 text-sm font-medium text-white disabled:opacity-50 dark:bg-zinc-100 dark:text-zinc-900"
       >
-        {loading ? "불러오는 중..." : "후원하기"}
+        {loading ? "불러오는 중..." : "자율금액 구독하기"}
       </button>
-      {error && <p className="w-full text-sm text-rose-600 dark:text-rose-400">{error}</p>}
+      {error && <p className="text-sm text-rose-600 dark:text-rose-400">{error}</p>}
     </form>
   );
 }

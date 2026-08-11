@@ -18,7 +18,7 @@ export default function LoginPage() {
     setLoading(true);
 
     const supabase = createClient();
-    const { error: signInError } = await supabase.auth.signInWithPassword({ email, password });
+    const { data, error: signInError } = await supabase.auth.signInWithPassword({ email, password });
     setLoading(false);
 
     if (signInError) {
@@ -26,7 +26,17 @@ export default function LoginPage() {
       return;
     }
 
-    router.push("/home");
+    let tier: string | null = null;
+    if (data.user) {
+      const { data: profile } = await supabase
+        .from("users")
+        .select("tier")
+        .eq("id", data.user.id)
+        .maybeSingle();
+      tier = profile?.tier ?? null;
+    }
+
+    router.push(tier === "유료" ? "/home" : "/pricing");
     router.refresh();
   }
 

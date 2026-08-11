@@ -4,7 +4,8 @@ import { supabaseAdmin } from "@/lib/supabase/admin";
 
 const ACTIVE_STATUSES = new Set(["active", "trialing", "past_due"]);
 
-function mapPlan(interval: string | undefined): "월간" | "연간" {
+function mapPlan(interval: string | undefined, isCustom: boolean): "월간" | "연간" | "자율" {
+  if (isCustom) return "자율";
   return interval === "year" ? "연간" : "월간";
 }
 
@@ -43,6 +44,7 @@ export async function POST(request: NextRequest) {
         console.error("[paddle webhook] subscription 이벤트에 customData.userId 없음", sub.id);
         break;
       }
+      const isCustom = sub.customData?.kind === "custom";
 
       const { error: subError } = await supabaseAdmin.from("subscriptions").upsert(
         {
@@ -50,7 +52,7 @@ export async function POST(request: NextRequest) {
           payment_provider: "paddle",
           provider_customer_id: sub.customerId,
           provider_subscription_id: sub.id,
-          plan: mapPlan(sub.billingCycle?.interval),
+          plan: mapPlan(sub.billingCycle?.interval, isCustom),
           status: sub.status,
           current_period_end: sub.currentBillingPeriod?.endsAt ?? null,
           updated_at: new Date().toISOString(),

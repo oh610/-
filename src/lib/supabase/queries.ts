@@ -5,6 +5,32 @@ function one<T>(value: T | T[] | null): T | null {
   return Array.isArray(value) ? value[0] ?? null : value;
 }
 
+export type SummaryCardListItem = {
+  id: string;
+  issueTitle: string;
+  publishedDate: string;
+  biasCheckPassed: boolean;
+};
+
+export async function getAllSummaryCards(): Promise<SummaryCardListItem[]> {
+  const { data, error } = await supabase
+    .from("summary_cards")
+    .select("id, issue_title, published_date, bias_check_passed")
+    .order("published_date", { ascending: false });
+
+  if (error) {
+    console.error("[getAllSummaryCards]", error);
+    return [];
+  }
+
+  return (data ?? []).map((row) => ({
+    id: row.id,
+    issueTitle: row.issue_title,
+    publishedDate: row.published_date,
+    biasCheckPassed: row.bias_check_passed,
+  }));
+}
+
 export async function getLatestSummaryCard(): Promise<SummaryCard | null> {
   const { data: card, error } = await supabase
     .from("summary_cards")
@@ -16,6 +42,31 @@ export async function getLatestSummaryCard(): Promise<SummaryCard | null> {
   if (error) console.error("[getLatestSummaryCard]", error);
   if (error || !card) return null;
 
+  return buildSummaryCard(card);
+}
+
+export async function getSummaryCardById(id: string): Promise<SummaryCard | null> {
+  const { data: card, error } = await supabase
+    .from("summary_cards")
+    .select("*")
+    .eq("id", id)
+    .maybeSingle();
+
+  if (error) console.error("[getSummaryCardById]", error);
+  if (error || !card) return null;
+
+  return buildSummaryCard(card);
+}
+
+async function buildSummaryCard(card: {
+  id: string;
+  issue_title: string;
+  issue_summary: string;
+  pro_stance_summary: string;
+  con_stance_summary: string;
+  bias_check_passed: boolean;
+  published_date: string;
+}): Promise<SummaryCard> {
   const [{ data: figureRows }, { data: citationRows }] = await Promise.all([
     supabase
       .from("summary_card_figures")

@@ -327,3 +327,9 @@ grant all on subscriptions, donations to service_role;
 -- ========================================
 
 alter table users add column if not exists nickname text;
+
+-- ========================================
+-- 자율금액구독 (매달 반복결제)
+-- ========================================
+
+alter type subscription_plan add value if not exists '자율';

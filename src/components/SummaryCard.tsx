@@ -13,11 +13,11 @@ function CitationList({ citations }: { citations: SummaryCardCitation[] }) {
   const hasSupplementary = citations.some((c) => c.sourceType !== "press_release");
 
   return (
-    <div className="mt-3 border-t border-black/5 pt-3 dark:border-white/10">
-      <p className="mb-1.5 text-xs font-semibold text-zinc-500 dark:text-zinc-400">근거 출처</p>
-      <ul className="flex flex-col gap-1.5">
+    <div className="mt-4 border-t border-black/5 pt-4 dark:border-white/10">
+      <p className="mb-2 text-xs font-semibold text-zinc-500 dark:text-zinc-400">근거 출처</p>
+      <ul className="flex flex-col gap-2.5">
         {citations.map((c) => (
-          <li key={c.id} className="text-xs text-zinc-600 dark:text-zinc-400">
+          <li key={c.id} className="text-[13px] leading-relaxed text-zinc-600 dark:text-zinc-400">
             <span
               className={
                 c.sourceType === "press_release"
@@ -70,7 +70,7 @@ export function SummaryCardView({ card }: { card: SummaryCard }) {
   const conCitations = card.citations.filter((c) => c.stance === "con");
 
   return (
-    <article className="w-full max-w-2xl rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-950">
+    <article className="w-full max-w-2xl rounded-2xl border border-zinc-200 bg-white p-7 shadow-sm sm:p-8 dark:border-zinc-800 dark:bg-zinc-950">
       <div className="flex items-center justify-between text-sm text-zinc-500 dark:text-zinc-400">
         <span>{card.publishedDate}</span>
         <span
@@ -84,32 +84,38 @@ export function SummaryCardView({ card }: { card: SummaryCard }) {
         </span>
       </div>
 
-      <h1 className="mt-3 text-2xl font-bold text-zinc-900 dark:text-zinc-50">
+      <h1 className="mt-4 text-2xl font-bold leading-snug text-zinc-900 dark:text-zinc-50">
         {card.issueTitle}
       </h1>
-      <p className="mt-2 text-zinc-600 dark:text-zinc-400">{card.issueSummary}</p>
+      <p className="mt-3 text-[15px] leading-relaxed text-zinc-600 dark:text-zinc-400">
+        {card.issueSummary}
+      </p>
 
-      <div className="mt-6 grid gap-4 sm:grid-cols-2">
-        <section className="rounded-xl border border-blue-200 bg-blue-50 p-4 dark:border-blue-900 dark:bg-blue-950/30">
-          <h2 className="mb-2 text-sm font-semibold text-blue-700 dark:text-blue-400">
+      <div className="mt-7 grid gap-5 sm:grid-cols-2">
+        <section className="rounded-xl border border-blue-200 bg-blue-50 p-5 dark:border-blue-900 dark:bg-blue-950/30">
+          <h2 className="mb-3 text-sm font-semibold text-blue-700 dark:text-blue-400">
             찬성(여당) 측 논리
           </h2>
-          <p className="text-sm text-zinc-700 dark:text-zinc-300">{card.proStanceSummary}</p>
+          <p className="text-[15px] leading-relaxed text-zinc-700 dark:text-zinc-300">
+            {card.proStanceSummary}
+          </p>
           <CitationList citations={proCitations} />
         </section>
 
-        <section className="rounded-xl border border-rose-200 bg-rose-50 p-4 dark:border-rose-900 dark:bg-rose-950/30">
-          <h2 className="mb-2 text-sm font-semibold text-rose-700 dark:text-rose-400">
+        <section className="rounded-xl border border-rose-200 bg-rose-50 p-5 dark:border-rose-900 dark:bg-rose-950/30">
+          <h2 className="mb-3 text-sm font-semibold text-rose-700 dark:text-rose-400">
             반대(야당) 측 논리
           </h2>
-          <p className="text-sm text-zinc-700 dark:text-zinc-300">{card.conStanceSummary}</p>
+          <p className="text-[15px] leading-relaxed text-zinc-700 dark:text-zinc-300">
+            {card.conStanceSummary}
+          </p>
           <CitationList citations={conCitations} />
         </section>
       </div>
 
       {card.relatedFigures.length > 0 && (
-        <div className="mt-6">
-          <h2 className="mb-2 text-sm font-semibold text-zinc-500 dark:text-zinc-400">
+        <div className="mt-7">
+          <h2 className="mb-3 text-sm font-semibold text-zinc-500 dark:text-zinc-400">
             관련 추진 인물
           </h2>
           <div className="flex flex-wrap gap-2">

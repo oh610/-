@@ -16,7 +16,7 @@ export async function POST(request: NextRequest) {
   }
 
   if (!DONATION_PRODUCT_ID) {
-    return NextResponse.json({ error: "후원 상품이 아직 설정되지 않았습니다." }, { status: 500 });
+    return NextResponse.json({ error: "구독 상품이 아직 설정되지 않았습니다." }, { status: 500 });
   }
 
   const body = await request.json().catch(() => null);
@@ -24,7 +24,7 @@ export async function POST(request: NextRequest) {
   if (!Number.isInteger(amount) || amount < MIN_AMOUNT || amount > MAX_AMOUNT) {
     return NextResponse.json(
       {
-        error: `후원 금액은 ${MIN_AMOUNT.toLocaleString()}원 이상 ${MAX_AMOUNT.toLocaleString()}원 이하의 정수로 입력해 주세요.`,
+        error: `구독 금액은 ${MIN_AMOUNT.toLocaleString()}원 이상 ${MAX_AMOUNT.toLocaleString()}원 이하의 정수로 입력해 주세요.`,
       },
       { status: 400 },
     );
@@ -35,14 +35,15 @@ export async function POST(request: NextRequest) {
     items: [
       {
         price: {
-          description: "정치뉴스요약서비스 후원",
+          description: "정치한스푼 자율금액구독",
           unitPrice: { amount: String(amount), currencyCode: "KRW" },
+          billingCycle: { interval: "month", frequency: 1 },
           productId: DONATION_PRODUCT_ID,
         },
         quantity: 1,
       },
     ],
-    customData: { userId: user.id, donorName: user.email ?? "익명" },
+    customData: { userId: user.id, kind: "custom" },
   });
 
   return NextResponse.json({ transactionId: transaction.id });
