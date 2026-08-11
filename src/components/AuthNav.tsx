@@ -6,9 +6,11 @@ import { useState } from "react";
 import { createClient } from "@/lib/supabase/browser";
 
 export function AuthNav({
+  isLoggedIn,
   userEmail,
   nickname,
 }: {
+  isLoggedIn: boolean;
   userEmail: string | null;
   nickname?: string | null;
 }) {
@@ -23,13 +25,13 @@ export function AuthNav({
     router.refresh();
   }
 
-  if (userEmail) {
+  if (isLoggedIn) {
     return (
       <div className="ml-auto flex items-center gap-3 text-sm">
         <Link href="/mypage" className="text-amber-50 hover:text-white hover:underline">
           마이페이지
         </Link>
-        <span className="text-amber-50">{nickname ? `${nickname}님` : userEmail}</span>
+        <span className="text-amber-50">{nickname ? `${nickname}님` : (userEmail ?? "회원님")}</span>
         <button
           onClick={handleLogout}
           disabled={loading}

@@ -66,7 +66,7 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
           <Link href="/contact" className="text-amber-50 hover:text-white hover:underline">
             문의
           </Link>
-          <AuthNav userEmail={user?.email ?? null} nickname={nickname} />
+          <AuthNav isLoggedIn={!!user} userEmail={user?.email ?? null} nickname={nickname} />
         </nav>
         {showAd && (
           <div className="border-b border-zinc-200 bg-white py-2 dark:border-zinc-800 dark:bg-zinc-950">

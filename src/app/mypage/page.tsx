@@ -37,7 +37,9 @@ export default async function MyPage() {
 
         <section className="mb-6 rounded-2xl border border-zinc-200 bg-white p-6 dark:border-zinc-800 dark:bg-zinc-950">
           <h2 className="mb-1 text-lg font-semibold text-zinc-900 dark:text-zinc-50">기본 정보</h2>
-          <p className="mb-4 text-sm text-zinc-500 dark:text-zinc-400">{user.email}</p>
+          <p className="mb-4 text-sm text-zinc-500 dark:text-zinc-400">
+            {user.email ?? "이메일 미제공 (소셜 로그인)"}
+          </p>
           <NicknameForm userId={user.id} initialNickname={profile?.nickname ?? ""} />
         </section>
 

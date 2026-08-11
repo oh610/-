@@ -181,7 +181,7 @@ create index idx_ideology_appeals_party_id on ideology_appeals(party_id);
 
 create table users (
   id uuid primary key references auth.users(id) on delete cascade,
-  email text not null,
+  email text, -- 일부 소셜 로그인(카카오 등)은 이메일 동의 없이 가입 가능해 필수 아님
   tier user_tier not null default '무료',
   created_at timestamptz not null default now()
 );
@@ -267,8 +267,16 @@ language plpgsql
 security definer set search_path = public
 as $$
 begin
-  insert into public.users (id, email)
-  values (new.id, new.email);
+  insert into public.users (id, email, nickname)
+  values (
+    new.id,
+    new.email,
+    coalesce(
+      new.raw_user_meta_data->>'nickname',
+      new.raw_user_meta_data->>'full_name',
+      new.raw_user_meta_data->>'name'
+    )
+  );
   return new;
 end;
 $$;
