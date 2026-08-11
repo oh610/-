@@ -1,5 +1,5 @@
 import "./_env";
-import { fetchCurrentMembers } from "@/lib/collectors/assembly";
+import { fetchCurrentMembers, fetchMemberPhotos } from "@/lib/collectors/assembly";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 
 // PRD 4.4 진영 이념 분류 기준표(초안) — 정권 교체와 무관하게 고정.
@@ -47,6 +47,10 @@ async function main() {
   const members = await fetchCurrentMembers();
   console.log(`${members.length}명 조회됨`);
 
+  console.log("의원 사진 URL 조회 중...");
+  const photoMap = await fetchMemberPhotos();
+  console.log(`${photoMap.size}명 사진 URL 확보`);
+
   const skipped: string[] = [];
   let upserted = 0;
 
@@ -77,6 +81,7 @@ async function main() {
         is_independent: isIndependent,
         district_type: districtType,
         district_name: districtName,
+        photo_url: photoMap.get(row.MONA_CD) ?? null,
       },
       { onConflict: "assembly_code" },
     );

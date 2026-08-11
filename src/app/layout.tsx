@@ -60,6 +60,9 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
           <Link href="/pricing" className="text-amber-50 hover:text-white hover:underline">
             요금제
           </Link>
+          <Link href="/guide" className="text-amber-50 hover:text-white hover:underline">
+            사용 방법
+          </Link>
           <AuthNav userEmail={user?.email ?? null} nickname={nickname} />
         </nav>
         {showAd && (

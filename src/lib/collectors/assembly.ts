@@ -52,6 +52,34 @@ export async function fetchCurrentMembers(): Promise<AssemblyCurrentMemberRow[]>
   return data[CURRENT_MEMBERS_SERVICE_ID]?.[1]?.row ?? [];
 }
 
+// 열린국회정보 국회의원 검색 페이지가 내부적으로 호출하는 비공식 엔드포인트.
+// 공식 Open API(nwvrqwxyaytdsfvhu)는 사진 URL을 제공하지 않아 이 엔드포인트를 대신 사용한다.
+const MEMBER_PHOTO_SEARCH_URL = "https://open.assembly.go.kr/portal/assm/search/searchAssmMemberSch.do";
+
+type AssemblyMemberSearchRow = { monaCd: string; deptImgUrl: string | null };
+type AssemblyMemberSearchResponse = { total: number; data: AssemblyMemberSearchRow[] };
+
+export async function fetchMemberPhotos(): Promise<Map<string, string>> {
+  const res = await fetch(MEMBER_PHOTO_SEARCH_URL, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/x-www-form-urlencoded",
+      "User-Agent":
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+      Referer: "https://open.assembly.go.kr/portal/assm/search/memberSchPage.do",
+    },
+    body: "page=1&rows=500",
+  });
+  if (!res.ok) throw new Error(`Assembly member photo search failed: ${res.status}`);
+
+  const data: AssemblyMemberSearchResponse = await res.json();
+  const map = new Map<string, string>();
+  for (const row of data.data) {
+    if (row.deptImgUrl) map.set(row.monaCd, row.deptImgUrl);
+  }
+  return map;
+}
+
 export type AssemblyBillRow = {
   BILL_ID: string;
   BILL_NO: string;

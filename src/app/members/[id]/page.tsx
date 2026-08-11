@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getMemberDetail } from "@/lib/supabase/members";
+import { searchNews, type NaverNewsItem } from "@/lib/collectors/naver-news";
 
 export const dynamic = "force-dynamic";
 
@@ -18,6 +19,33 @@ function IdeologyBadge({ ideology }: { ideology: "진보" | "보수" }) {
   );
 }
 
+function VoteResultBadge({ result }: { result: string }) {
+  const styles: Record<string, string> = {
+    찬성: "bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-400",
+    반대: "bg-rose-100 text-rose-700 dark:bg-rose-900/40 dark:text-rose-400",
+    기권: "bg-zinc-200 text-zinc-700 dark:bg-zinc-700 dark:text-zinc-200",
+    불참: "bg-zinc-200 text-zinc-700 dark:bg-zinc-700 dark:text-zinc-200",
+  };
+  return (
+    <span
+      className={`shrink-0 whitespace-nowrap rounded-full px-2 py-0.5 text-xs ${
+        styles[result] ?? "bg-zinc-200 text-zinc-700 dark:bg-zinc-700 dark:text-zinc-200"
+      }`}
+    >
+      {result}
+    </span>
+  );
+}
+
+async function getRelatedNews(name: string): Promise<NaverNewsItem[]> {
+  try {
+    return await searchNews(name, 5);
+  } catch (err) {
+    console.error("[member related news]", err);
+    return [];
+  }
+}
+
 export default async function MemberDetailPage({
   params,
 }: {
@@ -27,6 +55,8 @@ export default async function MemberDetailPage({
   const member = await getMemberDetail(id);
   if (!member) notFound();
 
+  const relatedNews = await getRelatedNews(member.name);
+
   return (
     <div className="min-h-screen bg-zinc-50 px-4 py-16 dark:bg-black">
       <main className="mx-auto flex w-full max-w-2xl flex-col gap-6">
@@ -35,14 +65,52 @@ export default async function MemberDetailPage({
         </Link>
 
         <section className="rounded-2xl border border-zinc-200 bg-white p-6 dark:border-zinc-800 dark:bg-zinc-950">
-          <div className="flex items-center justify-between">
-            <h1 className="text-2xl font-bold text-zinc-900 dark:text-zinc-50">{member.name}</h1>
-            {member.ideology && <IdeologyBadge ideology={member.ideology} />}
+          <div className="flex items-center gap-4">
+            {member.photoUrl ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={member.photoUrl}
+                alt={`${member.name} 의원 사진`}
+                className="h-20 w-20 shrink-0 rounded-xl object-cover"
+              />
+            ) : (
+              <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-xl bg-zinc-100 text-2xl font-semibold text-zinc-400 dark:bg-zinc-800 dark:text-zinc-600">
+                {member.name.slice(0, 1)}
+              </div>
+            )}
+            <div className="min-w-0 flex-1">
+              <div className="flex items-center justify-between">
+                <h1 className="text-2xl font-bold text-zinc-900 dark:text-zinc-50">{member.name}</h1>
+                {member.ideology && <IdeologyBadge ideology={member.ideology} />}
+              </div>
+              <p className="mt-1 text-zinc-600 dark:text-zinc-400">
+                {member.partyName ?? "무소속"} ·{" "}
+                {member.districtType === "지역구" ? member.districtName : "비례대표"}
+              </p>
+            </div>
           </div>
-          <p className="mt-1 text-zinc-600 dark:text-zinc-400">
-            {member.partyName ?? "무소속"} ·{" "}
-            {member.districtType === "지역구" ? member.districtName : "비례대표"}
-          </p>
+        </section>
+
+        <section className="rounded-2xl border border-zinc-200 bg-white p-6 dark:border-zinc-800 dark:bg-zinc-950">
+          <h2 className="mb-3 text-sm font-semibold text-zinc-500 dark:text-zinc-400">관련 뉴스</h2>
+          {relatedNews.length === 0 ? (
+            <p className="text-sm text-zinc-500 dark:text-zinc-400">관련 뉴스가 없습니다.</p>
+          ) : (
+            <ul className="flex flex-col gap-3">
+              {relatedNews.map((news) => (
+                <li key={news.link}>
+                  <a
+                    href={news.originallink || news.link}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-sm text-zinc-800 hover:underline dark:text-zinc-200"
+                  >
+                    {news.title}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          )}
         </section>
 
         <section className="rounded-2xl border border-zinc-200 bg-white p-6 dark:border-zinc-800 dark:bg-zinc-950">
@@ -52,9 +120,9 @@ export default async function MemberDetailPage({
           ) : (
             <ul className="flex flex-col gap-2">
               {member.bills.map((b) => (
-                <li key={`${b.role}-${b.id}`} className="flex items-center justify-between text-sm">
-                  <span className="text-zinc-800 dark:text-zinc-200">{b.title}</span>
-                  <span className="text-zinc-500 dark:text-zinc-400">
+                <li key={`${b.role}-${b.id}`} className="flex items-center justify-between gap-3 text-sm">
+                  <span className="min-w-0 text-zinc-800 dark:text-zinc-200">{b.title}</span>
+                  <span className="shrink-0 whitespace-nowrap text-zinc-500 dark:text-zinc-400">
                     {b.role} · {b.status} · {b.proposedDate}
                   </span>
                 </li>
@@ -70,9 +138,9 @@ export default async function MemberDetailPage({
           ) : (
             <ul className="flex flex-col gap-2">
               {member.votes.map((v) => (
-                <li key={v.id} className="flex items-center justify-between text-sm">
-                  <span className="text-zinc-800 dark:text-zinc-200">{v.billTitle}</span>
-                  <span className="text-zinc-500 dark:text-zinc-400">{v.result}</span>
+                <li key={v.id} className="flex items-center justify-between gap-3 text-sm">
+                  <span className="min-w-0 text-zinc-800 dark:text-zinc-200">{v.billTitle}</span>
+                  <VoteResultBadge result={v.result} />
                 </li>
               ))}
             </ul>

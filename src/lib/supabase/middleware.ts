@@ -30,12 +30,13 @@ export async function updateSession(request: NextRequest) {
 
   const path = request.nextUrl.pathname;
   const isAuthPage = path === "/login" || path === "/signup";
-  const publicOnlyPaths = ["/", "/forgot-password", "/reset-password", "/terms", "/privacy", "/pricing"];
+  const publicOnlyPaths = ["/", "/forgot-password", "/reset-password", "/terms", "/privacy", "/pricing", "/guide"];
   const isPublicPage =
     isAuthPage ||
     publicOnlyPaths.includes(path) ||
     path.startsWith("/auth/") ||
-    path.startsWith("/api/webhooks/");
+    path.startsWith("/api/webhooks/") ||
+    path.startsWith("/api/cron/");
 
   if (!user && !isPublicPage) {
     const url = request.nextUrl.clone();
