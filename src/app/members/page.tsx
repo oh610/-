@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { searchMembers } from "@/lib/supabase/members";
+import { createClient } from "@/lib/supabase/server";
+import { LoginPromptPopup } from "@/components/LoginPromptPopup";
 
 export const dynamic = "force-dynamic";
 
@@ -30,6 +32,11 @@ export default async function MembersPage({
 }) {
   const { q = "" } = await searchParams;
   const members = await searchMembers(q);
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
   return (
     <div className="min-h-screen bg-zinc-50 px-4 py-16 dark:bg-black">
@@ -84,6 +91,7 @@ export default async function MembersPage({
           )}
         </ul>
       </main>
+      {!user && <LoginPromptPopup />}
     </div>
   );
 }

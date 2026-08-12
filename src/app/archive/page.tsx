@@ -3,6 +3,7 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { getAllSummaryCards } from "@/lib/supabase/queries";
 import { hasFullAccess } from "@/lib/access";
+import { LoginPromptPopup } from "@/components/LoginPromptPopup";
 
 export const dynamic = "force-dynamic";
 
@@ -83,6 +84,7 @@ export default async function ArchivePage() {
           </ul>
         )}
       </main>
+      {!user && <LoginPromptPopup />}
     </div>
   );
 }

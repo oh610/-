@@ -4,11 +4,21 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 
 const DELAY_MS = 15000;
+const STORAGE_KEY = "loginPopupHiddenUntil";
+
+function endOfTodayISOString() {
+  const d = new Date();
+  d.setHours(23, 59, 59, 999);
+  return d.toISOString();
+}
 
 export function LoginPromptPopup() {
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
+    const hiddenUntil = localStorage.getItem(STORAGE_KEY);
+    if (hiddenUntil && new Date(hiddenUntil).getTime() > Date.now()) return;
+
     const timer = setTimeout(() => setVisible(true), DELAY_MS);
     return () => clearTimeout(timer);
   }, []);
@@ -21,6 +31,12 @@ export function LoginPromptPopup() {
       document.body.style.overflow = original;
     };
   }, [visible]);
+
+  function handleHideToday(checked: boolean) {
+    if (!checked) return;
+    localStorage.setItem(STORAGE_KEY, endOfTodayISOString());
+    setVisible(false);
+  }
 
   if (!visible) return null;
 
@@ -42,6 +58,14 @@ export function LoginPromptPopup() {
             로그인
           </Link>
         </div>
+        <label className="mt-4 flex items-center justify-center gap-1.5 text-xs text-zinc-400 dark:text-zinc-500">
+          <input
+            type="checkbox"
+            onChange={(e) => handleHideToday(e.target.checked)}
+            className="h-3.5 w-3.5 rounded border-zinc-300 dark:border-zinc-700"
+          />
+          오늘 하루만 보지 않기
+        </label>
       </div>
     </div>
   );

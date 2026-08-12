@@ -3,6 +3,8 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getMemberDetail } from "@/lib/supabase/members";
 import { searchNews, type NaverNewsItem } from "@/lib/collectors/naver-news";
+import { createClient } from "@/lib/supabase/server";
+import { LoginPromptPopup } from "@/components/LoginPromptPopup";
 
 export const dynamic = "force-dynamic";
 
@@ -72,6 +74,11 @@ export default async function MemberDetailPage({
   if (!member) notFound();
 
   const relatedNews = await getRelatedNews(member.name);
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
   return (
     <div className="min-h-screen bg-zinc-50 px-4 py-16 dark:bg-black">
@@ -196,6 +203,7 @@ export default async function MemberDetailPage({
           )}
         </section>
       </main>
+      {!user && <LoginPromptPopup />}
     </div>
   );
 }

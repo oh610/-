@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { getSummaryCardById } from "@/lib/supabase/queries";
 import { SummaryCardView } from "@/components/SummaryCard";
 import { hasFullAccess } from "@/lib/access";
+import { LoginPromptPopup } from "@/components/LoginPromptPopup";
 
 export const dynamic = "force-dynamic";
 
@@ -57,6 +58,7 @@ export default async function ArchiveDetailPage({
             ← 목록으로
           </Link>
         </main>
+        {!user && <LoginPromptPopup />}
       </div>
     );
   }
