@@ -7,12 +7,22 @@ function toParty(party: PartyRef) {
   return Array.isArray(party) ? party[0] ?? null : party;
 }
 
-export type DistrictOption = { id: string; region: string; districtLabel: string };
+// 국회 API가 내려주는 지역구 명칭은 "수원시병"처럼 시/군/구 이름과 갑·을·병 구분이 붙어있어
+// 정치에 관심 없는 사람은 한눈에 읽기 어렵다. 실제 관할 구역(예: 장안구)까지는 별도의
+// 검증된 선거구 경계 자료가 있어야 정확히 매길 수 있어 임의로 추정하지 않고,
+// 시/군/구 단위 뒤에 공백만 넣어 읽기 쉽게 다듬는다.
+export function formatDistrictName(name: string): string {
+  // 앞에 최소 2글자가 와야 매칭해, "구로구"처럼 지명 자체가 "구"로 시작하는
+  // 경우를 접미사로 착각해 잘못 쪼개지 않도록 한다.
+  return name.replace(/(?<=[가-힣]{2,})(시|군|구)(?=[가-힣])/g, "$1 ");
+}
+
+export type DistrictOption = { region: string; districtLabel: string; districtName: string };
 
 export async function getDistrictOptions(): Promise<DistrictOption[]> {
   const { data, error } = await supabase
     .from("members")
-    .select("id, district_name")
+    .select("district_name")
     .eq("district_type", "지역구")
     .not("district_name", "is", null)
     .order("district_name");
@@ -22,19 +32,27 @@ export async function getDistrictOptions(): Promise<DistrictOption[]> {
     return [];
   }
 
-  return (data ?? [])
-    .map((m) => {
-      const full = m.district_name ?? "";
-      const spaceIdx = full.indexOf(" ");
-      if (spaceIdx === -1) return null;
-      const region = full.slice(0, spaceIdx);
-      const districtLabel = full.slice(spaceIdx + 1);
-      return { id: m.id, region, districtLabel };
-    })
-    .filter((d): d is DistrictOption => d !== null);
+  const seen = new Set<string>();
+  const options: DistrictOption[] = [];
+  for (const m of data ?? []) {
+    const full = m.district_name ?? "";
+    if (seen.has(full)) continue;
+    seen.add(full);
+
+    const spaceIdx = full.indexOf(" ");
+    if (spaceIdx === -1) continue;
+    const region = full.slice(0, spaceIdx);
+    const districtLabel = formatDistrictName(full.slice(spaceIdx + 1));
+    options.push({ region, districtLabel, districtName: full });
+  }
+  return options;
 }
 
-export async function searchMembers(query: string): Promise<MemberListItem[]> {
+export async function searchMembers(
+  query: string,
+  region?: string,
+  district?: string,
+): Promise<MemberListItem[]> {
   let request = supabase
     .from("members")
     .select("id, name, district_type, district_name, photo_url, parties(name, ideology)")
@@ -42,6 +60,11 @@ export async function searchMembers(query: string): Promise<MemberListItem[]> {
 
   if (query.trim()) {
     request = request.ilike("name", `%${query.trim()}%`);
+  }
+  if (district) {
+    request = request.eq("district_name", district);
+  } else if (region) {
+    request = request.ilike("district_name", `${region} %`);
   }
 
   const { data, error } = await request;

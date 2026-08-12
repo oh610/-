@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getMemberDetail } from "@/lib/supabase/members";
+import { getMemberDetail, formatDistrictName } from "@/lib/supabase/members";
 import { searchNews, type NaverNewsItem } from "@/lib/collectors/naver-news";
 import { createClient } from "@/lib/supabase/server";
 import { LoginPromptPopup } from "@/components/LoginPromptPopup";
@@ -108,7 +108,9 @@ export default async function MemberDetailPage({
               </div>
               <p className="mt-1 text-zinc-600 dark:text-zinc-400">
                 {member.partyName ?? "무소속"} ·{" "}
-                {member.districtType === "지역구" ? member.districtName : "비례대표"}
+                {member.districtType === "지역구" && member.districtName
+                  ? formatDistrictName(member.districtName)
+                  : "비례대표"}
               </p>
             </div>
           </div>

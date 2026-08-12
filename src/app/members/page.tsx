@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { searchMembers, getDistrictOptions } from "@/lib/supabase/members";
+import { searchMembers, getDistrictOptions, formatDistrictName } from "@/lib/supabase/members";
 import { createClient } from "@/lib/supabase/server";
 import { LoginPromptPopup } from "@/components/LoginPromptPopup";
 import { DistrictFilter } from "@/components/DistrictFilter";
@@ -29,10 +29,13 @@ function IdeologyBadge({ ideology }: { ideology: "진보" | "보수" }) {
 export default async function MembersPage({
   searchParams,
 }: {
-  searchParams: Promise<{ q?: string }>;
+  searchParams: Promise<{ q?: string; region?: string; district?: string }>;
 }) {
-  const { q = "" } = await searchParams;
-  const [members, districtOptions] = await Promise.all([searchMembers(q), getDistrictOptions()]);
+  const { q = "", region, district } = await searchParams;
+  const [members, districtOptions] = await Promise.all([
+    searchMembers(q, region, district),
+    getDistrictOptions(),
+  ]);
 
   const supabase = await createClient();
   const {
@@ -52,6 +55,8 @@ export default async function MembersPage({
             placeholder="이름으로 검색"
             className="flex-1 rounded-lg border border-zinc-300 bg-white px-4 py-2 text-zinc-900 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
           />
+          {region && <input type="hidden" name="region" value={region} />}
+          {district && <input type="hidden" name="district" value={district} />}
           <button type="submit" className="btn-primary">
             검색
           </button>
@@ -82,7 +87,9 @@ export default async function MembersPage({
                   <p className="font-semibold text-zinc-900 dark:text-zinc-50">{m.name}</p>
                   <p className="text-sm text-zinc-500 dark:text-zinc-400">
                     {m.partyName ?? "무소속"} ·{" "}
-                    {m.districtType === "지역구" ? m.districtName : "비례대표"}
+                    {m.districtType === "지역구" && m.districtName
+                      ? formatDistrictName(m.districtName)
+                      : "비례대표"}
                   </p>
                 </div>
                 {m.ideology && <IdeologyBadge ideology={m.ideology} />}
