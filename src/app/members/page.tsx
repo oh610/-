@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { searchMembers } from "@/lib/supabase/members";
+import { searchMembers, getDistrictOptions } from "@/lib/supabase/members";
 import { createClient } from "@/lib/supabase/server";
 import { LoginPromptPopup } from "@/components/LoginPromptPopup";
+import { DistrictFilter } from "@/components/DistrictFilter";
 
 export const dynamic = "force-dynamic";
 
@@ -31,7 +32,7 @@ export default async function MembersPage({
   searchParams: Promise<{ q?: string }>;
 }) {
   const { q = "" } = await searchParams;
-  const members = await searchMembers(q);
+  const [members, districtOptions] = await Promise.all([searchMembers(q), getDistrictOptions()]);
 
   const supabase = await createClient();
   const {
@@ -55,6 +56,8 @@ export default async function MembersPage({
             검색
           </button>
         </form>
+
+        <DistrictFilter districts={districtOptions} />
 
         <ul className="flex flex-col gap-3">
           {members.map((m) => (

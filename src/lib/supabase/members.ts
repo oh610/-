@@ -7,6 +7,33 @@ function toParty(party: PartyRef) {
   return Array.isArray(party) ? party[0] ?? null : party;
 }
 
+export type DistrictOption = { id: string; region: string; districtLabel: string };
+
+export async function getDistrictOptions(): Promise<DistrictOption[]> {
+  const { data, error } = await supabase
+    .from("members")
+    .select("id, district_name")
+    .eq("district_type", "지역구")
+    .not("district_name", "is", null)
+    .order("district_name");
+
+  if (error) {
+    console.error("[getDistrictOptions]", error);
+    return [];
+  }
+
+  return (data ?? [])
+    .map((m) => {
+      const full = m.district_name ?? "";
+      const spaceIdx = full.indexOf(" ");
+      if (spaceIdx === -1) return null;
+      const region = full.slice(0, spaceIdx);
+      const districtLabel = full.slice(spaceIdx + 1);
+      return { id: m.id, region, districtLabel };
+    })
+    .filter((d): d is DistrictOption => d !== null);
+}
+
 export async function searchMembers(query: string): Promise<MemberListItem[]> {
   let request = supabase
     .from("members")
