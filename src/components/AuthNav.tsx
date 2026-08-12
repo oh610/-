@@ -27,7 +27,7 @@ export function AuthNav({
 
   if (isLoggedIn) {
     return (
-      <div className="ml-auto flex items-center gap-3 text-sm">
+      <div className="ml-auto flex shrink-0 items-center gap-2.5 text-[13px] whitespace-nowrap sm:gap-3 sm:text-sm">
         <Link href="/mypage" className="text-amber-50 hover:text-white hover:underline">
           마이페이지
         </Link>
@@ -44,7 +44,7 @@ export function AuthNav({
   }
 
   return (
-    <div className="ml-auto flex items-center gap-4 text-sm">
+    <div className="ml-auto flex shrink-0 items-center gap-3 text-[13px] whitespace-nowrap sm:gap-4 sm:text-sm">
       <Link href="/login" className="text-amber-50 hover:text-white hover:underline">
         로그인
       </Link>

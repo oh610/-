@@ -1,14 +1,31 @@
 import { SummaryCardView } from "@/components/SummaryCard";
 import { DailyCardSlider } from "@/components/DailyCardSlider";
 import { ReviewPromptPopup } from "@/components/ReviewPromptPopup";
+import { SubscribePromptPopup } from "@/components/SubscribePromptPopup";
 import { dummySummaryCard } from "@/lib/dummy-data";
 import { getLatestSummaryCard } from "@/lib/supabase/queries";
+import { createClient } from "@/lib/supabase/server";
+import { hasFullAccess } from "@/lib/access";
 
 export const dynamic = "force-dynamic";
 
 export default async function Home() {
   const dbCard = await getLatestSummaryCard();
   const card = dbCard ?? dummySummaryCard;
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  let tier: string | null = null;
+  let isAdmin = false;
+  if (user) {
+    const { data } = await supabase.from("users").select("tier, is_admin").eq("id", user.id).maybeSingle();
+    tier = data?.tier ?? null;
+    isAdmin = data?.is_admin ?? false;
+  }
+  const access = hasFullAccess(tier, isAdmin);
 
   return (
     <div className="flex min-h-screen flex-col items-center bg-zinc-50 px-4 py-16 dark:bg-black">
@@ -21,11 +38,12 @@ export default async function Home() {
             Supabase에서 데이터를 가져오지 못해 샘플 데이터를 표시 중입니다. (schema.sql / seed.sql 적용 여부 확인)
           </p>
         )}
-        <DailyCardSlider>
+        <DailyCardSlider hasAccess={access} userId={user?.id ?? null} userEmail={user?.email ?? null}>
           <SummaryCardView card={card} />
         </DailyCardSlider>
       </main>
       <ReviewPromptPopup />
+      {!access && <SubscribePromptPopup userId={user?.id ?? null} userEmail={user?.email ?? null} />}
     </div>
   );
 }

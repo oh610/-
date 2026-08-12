@@ -1,6 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { CheckoutButton } from "@/components/CheckoutButton";
 import { CustomSubscribeForm } from "@/components/CustomSubscribeForm";
+import { hasFullAccess } from "@/lib/access";
 
 const MONTHLY_PRICE_ID = process.env.NEXT_PUBLIC_PADDLE_PRICE_MONTHLY;
 const ANNUAL_PRICE_ID = process.env.NEXT_PUBLIC_PADDLE_PRICE_ANNUAL;
@@ -12,9 +13,11 @@ export default async function PricingPage() {
   } = await supabase.auth.getUser();
 
   let tier: string | null = null;
+  let isAdmin = false;
   if (user) {
-    const { data } = await supabase.from("users").select("tier").eq("id", user.id).maybeSingle();
+    const { data } = await supabase.from("users").select("tier, is_admin").eq("id", user.id).maybeSingle();
     tier = data?.tier ?? null;
+    isAdmin = data?.is_admin ?? false;
   }
 
   const buttonClass =
@@ -25,9 +28,11 @@ export default async function PricingPage() {
       <main className="w-full max-w-4xl">
         <h1 className="mb-2 text-2xl font-bold text-zinc-900 dark:text-zinc-50">요금제</h1>
         <p className="mb-8 text-sm text-zinc-500 dark:text-zinc-400">
-          {tier === "유료"
-            ? "현재 유료 구독 중입니다. 광고 없이, 지난 뉴스 요약도 모두 이용하고 계세요."
-            : "무료로도 오늘의 요약을 보실 수 있어요. 광고 없이, 지난 뉴스 요약까지 보시려면 구독해 주세요."}
+          {isAdmin
+            ? "관리자 계정입니다. 구독 없이도 모든 콘텐츠를 이용할 수 있어요."
+            : hasFullAccess(tier, isAdmin)
+              ? "현재 유료 구독 중입니다. 광고 없이, 지난 뉴스 요약도 모두 이용하고 계세요."
+              : "무료로도 오늘의 요약을 보실 수 있어요. 광고 없이, 지난 뉴스 요약까지 보시려면 구독해 주세요."}
         </p>
 
         <div className="grid gap-4 sm:grid-cols-3">

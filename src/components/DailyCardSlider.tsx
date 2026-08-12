@@ -2,18 +2,54 @@
 
 import Link from "next/link";
 import { useState, type ReactNode } from "react";
+import { CheckoutButton } from "@/components/CheckoutButton";
 
-function LockedPanel({ message }: { message: string }) {
+const MONTHLY_PRICE_ID = process.env.NEXT_PUBLIC_PADDLE_PRICE_MONTHLY;
+
+function PastPanel({
+  hasAccess,
+  userId,
+  userEmail,
+}: {
+  hasAccess: boolean;
+  userId: string | null;
+  userEmail: string | null;
+}) {
+  if (hasAccess) {
+    return (
+      <div className="flex h-full min-h-[300px] w-full max-w-2xl flex-col items-center justify-center gap-3 rounded-2xl border border-zinc-200 bg-white p-8 text-center shadow-sm dark:border-zinc-800 dark:bg-zinc-950">
+        <span className="text-4xl">🗂️</span>
+        <p className="text-sm text-zinc-600 dark:text-zinc-400">지난 뉴스 요약을 모두 열람할 수 있어요</p>
+        <Link
+          href="/archive"
+          className="mt-2 rounded-lg bg-amber-600 px-4 py-2 text-sm font-medium text-white hover:bg-amber-700"
+        >
+          지난 뉴스 보러 가기
+        </Link>
+      </div>
+    );
+  }
+
   return (
     <div className="flex h-full min-h-[300px] w-full max-w-2xl flex-col items-center justify-center gap-3 rounded-2xl border border-zinc-200 bg-white p-8 text-center shadow-sm dark:border-zinc-800 dark:bg-zinc-950">
       <span className="text-4xl">🔒</span>
-      <p className="text-sm text-zinc-600 dark:text-zinc-400">{message}</p>
-      <Link
-        href="/pricing"
+      <p className="text-sm text-zinc-600 dark:text-zinc-400">구독하면 지난 뉴스 요약을 볼 수 있어요</p>
+      <CheckoutButton
+        priceId={MONTHLY_PRICE_ID}
+        label="구독하기"
+        userId={userId}
+        userEmail={userEmail}
         className="mt-2 rounded-lg bg-amber-600 px-4 py-2 text-sm font-medium text-white hover:bg-amber-700"
-      >
-        구독하기
-      </Link>
+      />
+    </div>
+  );
+}
+
+function TomorrowPanel() {
+  return (
+    <div className="flex h-full min-h-[300px] w-full max-w-2xl flex-col items-center justify-center gap-3 rounded-2xl border border-zinc-200 bg-white p-8 text-center shadow-sm dark:border-zinc-800 dark:bg-zinc-950">
+      <span className="text-4xl">🔒</span>
+      <p className="text-sm text-zinc-600 dark:text-zinc-400">내일 아침 9시에 새로운 요약이 업데이트돼요</p>
     </div>
   );
 }
@@ -29,7 +65,17 @@ function GhostPeek({ side }: { side: "left" | "right" }) {
   );
 }
 
-export function DailyCardSlider({ children }: { children: ReactNode }) {
+export function DailyCardSlider({
+  children,
+  hasAccess = false,
+  userId = null,
+  userEmail = null,
+}: {
+  children: ReactNode;
+  hasAccess?: boolean;
+  userId?: string | null;
+  userEmail?: string | null;
+}) {
   const [index, setIndex] = useState(0); // -1 지난 뉴스, 0 오늘, 1 내일
 
   return (
@@ -57,11 +103,11 @@ export function DailyCardSlider({ children }: { children: ReactNode }) {
           style={{ transform: `translateX(${-(index + 1) * 100}%)` }}
         >
           <div className="w-full shrink-0 px-1">
-            <LockedPanel message="구독하면 지난 뉴스 요약을 볼 수 있어요" />
+            <PastPanel hasAccess={hasAccess} userId={userId} userEmail={userEmail} />
           </div>
           <div className="w-full shrink-0 px-1">{children}</div>
           <div className="w-full shrink-0 px-1">
-            <LockedPanel message="내일 아침 9시에 새로운 요약이 업데이트돼요" />
+            <TomorrowPanel />
           </div>
         </div>
       </div>

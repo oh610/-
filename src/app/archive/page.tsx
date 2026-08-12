@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { getAllSummaryCards } from "@/lib/supabase/queries";
+import { hasFullAccess } from "@/lib/access";
 
 export const dynamic = "force-dynamic";
 
@@ -11,11 +12,13 @@ export default async function ArchivePage() {
   } = await supabase.auth.getUser();
 
   let tier: string | null = null;
+  let isAdmin = false;
   if (user) {
-    const { data } = await supabase.from("users").select("tier").eq("id", user.id).maybeSingle();
+    const { data } = await supabase.from("users").select("tier, is_admin").eq("id", user.id).maybeSingle();
     tier = data?.tier ?? null;
+    isAdmin = data?.is_admin ?? false;
   }
-  const isSubscriber = tier === "유료";
+  const isSubscriber = hasFullAccess(tier, isAdmin);
 
   const cards = await getAllSummaryCards();
 

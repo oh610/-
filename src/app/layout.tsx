@@ -1,9 +1,10 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import Link from "next/link";
 import { AuthNav } from "@/components/AuthNav";
 import { AdBanner } from "@/components/AdBanner";
 import { createClient } from "@/lib/supabase/server";
+import { hasFullAccess } from "@/lib/access";
 import "./globals.css";
 
 const ADFIT_UNIT_ID = process.env.NEXT_PUBLIC_ADFIT_UNIT_ID;
@@ -23,6 +24,11 @@ export const metadata: Metadata = {
   description: "진보·보수 양쪽 입장을 한눈에 비교하는 정치 뉴스 요약 서비스",
 };
 
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+};
+
 export default async function RootLayout({ children }: LayoutProps<"/">) {
   const supabase = await createClient();
   const {
@@ -31,12 +37,18 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
 
   let tier: string | null = null;
   let nickname: string | null = null;
+  let isAdmin = false;
   if (user) {
-    const { data } = await supabase.from("users").select("tier, nickname").eq("id", user.id).maybeSingle();
+    const { data } = await supabase
+      .from("users")
+      .select("tier, nickname, is_admin")
+      .eq("id", user.id)
+      .maybeSingle();
     tier = data?.tier ?? null;
     nickname = data?.nickname ?? null;
+    isAdmin = data?.is_admin ?? false;
   }
-  const showAd = ADFIT_UNIT_ID && tier !== "유료";
+  const showAd = ADFIT_UNIT_ID && !hasFullAccess(tier, isAdmin);
 
   return (
     <html
@@ -44,28 +56,33 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
-        <nav className="flex items-center gap-5 bg-amber-600 px-6 py-3 text-sm dark:bg-amber-800">
-          <Link href="/" className="font-bold text-white">
+        <nav className="flex flex-wrap items-center gap-x-3 gap-y-1.5 overflow-x-auto bg-amber-600 px-3 py-2.5 text-[13px] whitespace-nowrap sm:gap-x-5 sm:px-6 sm:py-3 sm:text-sm dark:bg-amber-800">
+          <Link href="/" className="shrink-0 font-bold text-white">
             정치한스푼
           </Link>
-          <Link href="/home" className="text-amber-50 hover:text-white hover:underline">
+          <Link href="/home" className="shrink-0 text-amber-50 hover:text-white hover:underline">
             오늘의 요약
           </Link>
-          <Link href="/archive" className="text-amber-50 hover:text-white hover:underline">
+          <Link href="/archive" className="shrink-0 text-amber-50 hover:text-white hover:underline">
             지난 뉴스 요약
           </Link>
-          <Link href="/members" className="text-amber-50 hover:text-white hover:underline">
+          <Link href="/members" className="shrink-0 text-amber-50 hover:text-white hover:underline">
             국회의원 정보
           </Link>
-          <Link href="/pricing" className="text-amber-50 hover:text-white hover:underline">
+          <Link href="/pricing" className="shrink-0 text-amber-50 hover:text-white hover:underline">
             요금제
           </Link>
-          <Link href="/guide" className="text-amber-50 hover:text-white hover:underline">
+          <Link href="/guide" className="shrink-0 text-amber-50 hover:text-white hover:underline">
             사용 방법
           </Link>
-          <Link href="/contact" className="text-amber-50 hover:text-white hover:underline">
+          <Link href="/contact" className="shrink-0 text-amber-50 hover:text-white hover:underline">
             문의
           </Link>
+          {isAdmin && (
+            <Link href="/admin" className="shrink-0 text-amber-50 hover:text-white hover:underline">
+              관리자
+            </Link>
+          )}
           <AuthNav isLoggedIn={!!user} userEmail={user?.email ?? null} nickname={nickname} />
         </nav>
         {showAd && (

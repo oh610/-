@@ -370,3 +370,10 @@ grant all on reviews to service_role;
 -- ========================================
 
 alter table bills add column if not exists assembly_bill_id text;
+
+-- ========================================
+-- 관리자 계정
+-- is_admin = true 인 계정은 구독(tier='유료') 없이도 전체 콘텐츠에 접근 가능.
+-- ========================================
+
+alter table users add column if not exists is_admin boolean not null default false;

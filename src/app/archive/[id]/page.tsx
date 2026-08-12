@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getSummaryCardById } from "@/lib/supabase/queries";
 import { SummaryCardView } from "@/components/SummaryCard";
+import { hasFullAccess } from "@/lib/access";
 
 export const dynamic = "force-dynamic";
 
@@ -22,12 +23,14 @@ export default async function ArchiveDetailPage({
   } = await supabase.auth.getUser();
 
   let tier: string | null = null;
+  let isAdmin = false;
   if (user) {
-    const { data } = await supabase.from("users").select("tier").eq("id", user.id).maybeSingle();
+    const { data } = await supabase.from("users").select("tier, is_admin").eq("id", user.id).maybeSingle();
     tier = data?.tier ?? null;
+    isAdmin = data?.is_admin ?? false;
   }
 
-  if (tier !== "유료") {
+  if (!hasFullAccess(tier, isAdmin)) {
     return (
       <div className="flex min-h-screen flex-col items-center bg-zinc-50 px-4 py-16 dark:bg-black">
         <main className="w-full max-w-2xl text-center">

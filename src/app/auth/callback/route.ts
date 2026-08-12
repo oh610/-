@@ -10,13 +10,7 @@ export async function GET(request: NextRequest) {
     const { data, error } = await supabase.auth.exchangeCodeForSession(code);
 
     if (!error && data.user) {
-      const { data: profile } = await supabase
-        .from("users")
-        .select("tier")
-        .eq("id", data.user.id)
-        .maybeSingle();
-
-      return NextResponse.redirect(`${origin}${profile?.tier === "유료" ? "/home" : "/pricing"}`);
+      return NextResponse.redirect(`${origin}/home`);
     }
   }
 
