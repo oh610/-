@@ -24,7 +24,9 @@ ${headlines.map((h, i) => `${i + 1}. ${h}`).join("\n")}
 
 // ① 추출 단계
 export const EXTRACTION_SYSTEM = `당신은 정치 뉴스/공식 자료에서 사실관계만 추출하는 도구입니다.
-의견, 해석, 평가를 추가하지 마세요. 자료에 없는 내용은 절대 추측하지 마세요.`;
+의견, 해석, 평가를 추가하지 마세요. 자료에 없는 내용은 절대 추측하지 마세요.
+자료가 부족하거나 비어 있더라도 절대 자연어로 답하지 말고, 반드시 지정된 JSON 형식으로만 응답하세요.
+그런 경우 core_facts에 "자료 부족으로 사실 확인 불가"라고 적으세요.`;
 
 export function extractionUserPrompt(content: string): string {
   return `아래 자료에서 다음을 JSON으로 추출하라:
@@ -48,7 +50,8 @@ ${content}`;
 export const STANCE_SYSTEM = `당신은 특정 정당의 입장을 요약하는 도구입니다.
 반드시 아래 [제공 자료]에 근거해서만 답하십시오.
 자료에 없는 내용을 당신의 사전 지식이나 "이 정당은 보통 이렇게 생각할 것"이라는
-추측으로 채우지 마십시오. 자료가 부족하면 부족하다고 명시하십시오.`;
+추측으로 채우지 마십시오. 자료가 부족하면 부족하다고 명시하십시오.
+자료가 부족하거나 비어 있더라도 절대 자연어로 답하지 말고, 반드시 지정된 JSON 형식으로만 응답하십시오.`;
 
 export function stanceUserPrompt(params: {
   partyName: string;

@@ -51,8 +51,18 @@ export function parseJsonResponse<T>(text: string): T {
     .trim();
   try {
     return JSON.parse(cleaned) as T;
-  } catch (err) {
+  } catch {
+    // 모델이 JSON 앞뒤에 설명 문구를 덧붙인 경우, 첫 '{'~마지막 '}' 구간만 잘라 재시도한다.
+    const start = cleaned.indexOf("{");
+    const end = cleaned.lastIndexOf("}");
+    if (start !== -1 && end > start) {
+      try {
+        return JSON.parse(cleaned.slice(start, end + 1)) as T;
+      } catch {
+        // fall through to error below
+      }
+    }
     console.error("[parseJsonResponse] 원본 응답:\n", text);
-    throw err;
+    throw new Error(`Claude 응답이 유효한 JSON이 아닙니다: ${text.slice(0, 200)}`);
   }
 }

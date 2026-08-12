@@ -96,7 +96,19 @@ export async function generateDailySummary(log: (msg: string) => void = console.
   log(`    -> 선정 이유: ${issue.reason}`);
 
   log("3/6 관련 기사 수집 중...");
-  const focused = await searchNews(issue.search_query, 12);
+  let focused = await searchNews(issue.search_query, 12);
+  if (focused.length === 0) {
+    // 검색어에 단어가 많으면(AND 매칭) 결과가 0건일 수 있어, 첫 단어만으로 재시도한다.
+    const fallbackQuery = issue.search_query.split(/\s+/)[0];
+    log(`    -> "${issue.search_query}" 검색 결과 없음, "${fallbackQuery}"로 재검색`);
+    focused = await searchNews(fallbackQuery, 12);
+  }
+  if (focused.length === 0) {
+    throw new Error(
+      `기사 수집 실패: "${issue.issue_title}" 관련 기사를 찾지 못했습니다 (검색어: ${issue.search_query})`,
+    );
+  }
+
   const articles: ArticleRow[] = [];
   for (const item of focused) {
     articles.push(await upsertArticle(item));
