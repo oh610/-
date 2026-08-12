@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import Link from "next/link";
 import { AuthNav } from "@/components/AuthNav";
+import { MainNav } from "@/components/MainNav";
 import { AdBanner } from "@/components/AdBanner";
 import { createClient } from "@/lib/supabase/server";
 import { hasFullAccess } from "@/lib/access";
@@ -56,28 +57,11 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
-        <nav className="sticky top-0 z-40 flex flex-wrap items-center gap-x-4 gap-y-1.5 overflow-x-auto bg-zinc-950 px-3 py-2.5 text-[13px] whitespace-nowrap sm:gap-x-6 sm:px-6 sm:py-3.5 sm:text-sm">
+        <nav className="sticky top-0 z-40 flex flex-wrap items-center gap-x-4 gap-y-1.5 bg-zinc-950 px-3 py-2.5 text-[13px] sm:gap-x-6 sm:px-6 sm:py-3.5 sm:text-sm">
           <Link href="/" className="shrink-0 text-base font-extrabold tracking-tight text-white sm:text-lg">
             정론<span className="text-amber-400">관</span>
           </Link>
-          <Link href="/home" className="shrink-0 text-zinc-300 transition hover:text-amber-400">
-            오늘의 요약
-          </Link>
-          <Link href="/archive" className="shrink-0 text-zinc-300 transition hover:text-amber-400">
-            지난 뉴스 요약
-          </Link>
-          <Link href="/members" className="shrink-0 text-zinc-300 transition hover:text-amber-400">
-            국회의원 정보
-          </Link>
-          <Link href="/pricing" className="shrink-0 text-zinc-300 transition hover:text-amber-400">
-            요금제
-          </Link>
-          <Link href="/guide" className="shrink-0 text-zinc-300 transition hover:text-amber-400">
-            사용 방법
-          </Link>
-          <Link href="/contact" className="shrink-0 text-zinc-300 transition hover:text-amber-400">
-            문의
-          </Link>
+          <MainNav />
           {isAdmin && (
             <Link
               href="/admin"
