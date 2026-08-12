@@ -51,7 +51,7 @@ export function CustomSubscribeForm({ userId }: { userId: string | null }) {
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-2">
-      <label className="flex items-center rounded-xl border border-zinc-300 px-3 py-2.5 transition focus-within:border-amber-400 dark:border-zinc-700">
+      <label className="flex items-center rounded-xl border border-zinc-300 px-3 py-2.5 transition focus-within:border-violet-500 dark:border-zinc-700">
         <input
           type="number"
           min={1000}

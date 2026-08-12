@@ -56,7 +56,7 @@ export default function SignupPage() {
   return (
     <div className="flex min-h-screen flex-col items-center bg-zinc-50 px-4 py-16 dark:bg-black">
       <main className="w-full max-w-sm">
-        <h1 className="mb-6 text-2xl font-black tracking-tight text-zinc-950 dark:text-zinc-50">회원가입</h1>
+        <h1 className="mb-6 text-2xl font-bold text-zinc-950 dark:text-zinc-50">회원가입</h1>
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-3">
           <input
@@ -65,7 +65,7 @@ export default function SignupPage() {
             placeholder="이메일"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="rounded-xl border border-zinc-300 bg-white px-4 py-2.5 text-zinc-900 outline-none transition focus:border-amber-400 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
+            className="rounded-xl border border-zinc-300 bg-white px-4 py-2.5 text-zinc-900 outline-none transition focus:border-violet-500 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
           />
           <input
             type="password"
@@ -73,7 +73,7 @@ export default function SignupPage() {
             placeholder="비밀번호 (6자 이상)"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="rounded-xl border border-zinc-300 bg-white px-4 py-2.5 text-zinc-900 outline-none transition focus:border-amber-400 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
+            className="rounded-xl border border-zinc-300 bg-white px-4 py-2.5 text-zinc-900 outline-none transition focus:border-violet-500 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
           />
           <input
             type="password"
@@ -81,7 +81,7 @@ export default function SignupPage() {
             placeholder="비밀번호 확인"
             value={passwordConfirm}
             onChange={(e) => setPasswordConfirm(e.target.value)}
-            className="rounded-xl border border-zinc-300 bg-white px-4 py-2.5 text-zinc-900 outline-none transition focus:border-amber-400 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
+            className="rounded-xl border border-zinc-300 bg-white px-4 py-2.5 text-zinc-900 outline-none transition focus:border-violet-500 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
           />
 
           <label className="flex items-start gap-2 text-sm text-zinc-600 dark:text-zinc-400">
@@ -89,14 +89,14 @@ export default function SignupPage() {
               type="checkbox"
               checked={agreed}
               onChange={(e) => setAgreed(e.target.checked)}
-              className="mt-0.5 accent-amber-500"
+              className="mt-0.5 accent-violet-500"
             />
             <span>
-              <Link href="/terms" target="_blank" className="font-medium text-amber-600 hover:underline dark:text-amber-400">
+              <Link href="/terms" target="_blank" className="font-medium text-violet-600 hover:underline dark:text-violet-400">
                 이용약관
               </Link>{" "}
               및{" "}
-              <Link href="/privacy" target="_blank" className="font-medium text-amber-600 hover:underline dark:text-amber-400">
+              <Link href="/privacy" target="_blank" className="font-medium text-violet-600 hover:underline dark:text-violet-400">
                 개인정보처리방침
               </Link>
               에 동의합니다.
@@ -119,7 +119,7 @@ export default function SignupPage() {
 
         <p className="mt-4 text-sm text-zinc-500 dark:text-zinc-400">
           이미 계정이 있으신가요?{" "}
-          <Link href="/login" className="font-medium text-amber-600 hover:underline dark:text-amber-400">
+          <Link href="/login" className="font-medium text-violet-600 hover:underline dark:text-violet-400">
             로그인
           </Link>
         </p>

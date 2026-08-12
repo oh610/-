@@ -58,14 +58,14 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
     >
       <body className="min-h-full flex flex-col">
         <nav className="sticky top-0 z-40 flex flex-wrap items-center gap-x-4 gap-y-1.5 bg-zinc-950 px-3 py-2.5 text-[13px] sm:gap-x-6 sm:px-6 sm:py-3.5 sm:text-sm">
-          <Link href="/" className="shrink-0 text-base font-extrabold tracking-tight text-white sm:text-lg">
-            정론<span className="text-amber-400">관</span>
+          <Link href="/" className="shrink-0 text-base font-bold text-white sm:text-lg">
+            정론<span className="text-violet-400">관</span>
           </Link>
           <MainNav />
           {isAdmin && (
             <Link
               href="/admin"
-              className="shrink-0 rounded-full bg-amber-400/10 px-2.5 py-1 text-xs font-semibold text-amber-400 transition hover:bg-amber-400/20"
+              className="shrink-0 rounded-full bg-violet-400/10 px-2.5 py-1 text-xs font-semibold text-violet-400 transition hover:bg-violet-400/20"
             >
               관리자
             </Link>
@@ -79,8 +79,8 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
         )}
         <div className="flex flex-1 flex-col">{children}</div>
         <footer className="flex flex-col items-center gap-3 border-t border-zinc-200 bg-zinc-50 px-6 py-8 text-xs text-zinc-500 dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-400">
-          <span className="text-sm font-extrabold tracking-tight text-zinc-900 dark:text-zinc-50">
-            정론<span className="text-amber-500">관</span>
+          <span className="text-sm font-bold text-zinc-900 dark:text-zinc-50">
+            정론<span className="text-violet-500">관</span>
           </span>
           <div className="flex gap-4">
             <Link href="/terms" className="hover:underline">

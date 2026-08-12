@@ -25,7 +25,7 @@ export default async function PricingPage() {
   return (
     <div className="flex min-h-screen flex-col items-center bg-zinc-50 px-4 py-16 dark:bg-black">
       <main className="w-full max-w-4xl">
-        <h1 className="mb-2 text-3xl font-black tracking-tight text-zinc-950 dark:text-zinc-50">요금제</h1>
+        <h1 className="mb-2 text-3xl font-bold text-zinc-950 dark:text-zinc-50">요금제</h1>
         <p className="mb-10 text-sm text-zinc-500 dark:text-zinc-400">
           {isAdmin
             ? "관리자 계정입니다. 구독 없이도 모든 콘텐츠를 이용할 수 있어요."
@@ -37,7 +37,7 @@ export default async function PricingPage() {
         <div className="grid gap-5 sm:grid-cols-3">
           <section className="rounded-2xl border border-zinc-200 bg-white p-6 dark:border-zinc-800 dark:bg-zinc-950">
             <h2 className="text-sm font-semibold text-zinc-500 dark:text-zinc-400">월간 구독</h2>
-            <p className="mt-2 text-3xl font-black tracking-tight text-zinc-950 dark:text-zinc-50">
+            <p className="mt-2 text-3xl font-bold text-zinc-950 dark:text-zinc-50">
               4,900<span className="text-sm font-normal text-zinc-500 dark:text-zinc-400">원 / 월</span>
             </p>
             <p className="mt-3 text-sm text-zinc-500 dark:text-zinc-400">매달 결제, 언제든 해지 가능</p>
@@ -51,12 +51,12 @@ export default async function PricingPage() {
             />
           </section>
 
-          <section className="relative rounded-2xl border-2 border-amber-400 bg-white p-6 shadow-md dark:bg-zinc-950">
-            <span className="absolute -top-3 left-6 rounded-full bg-amber-400 px-3 py-1 text-xs font-bold text-zinc-950">
+          <section className="relative rounded-2xl border-2 border-violet-500 bg-white p-6 shadow-md dark:bg-zinc-950">
+            <span className="absolute -top-3 left-6 rounded-full bg-violet-600 px-3 py-1 text-xs font-bold text-white">
               추천
             </span>
             <h2 className="text-sm font-semibold text-zinc-500 dark:text-zinc-400">연간 구독</h2>
-            <p className="mt-2 text-3xl font-black tracking-tight text-zinc-950 dark:text-zinc-50">
+            <p className="mt-2 text-3xl font-bold text-zinc-950 dark:text-zinc-50">
               46,800<span className="text-sm font-normal text-zinc-500 dark:text-zinc-400">원 / 년</span>
             </p>
             <p className="mt-3 text-sm text-zinc-500 dark:text-zinc-400">월 3,900원 상당 · 연 1회 결제</p>
@@ -72,7 +72,7 @@ export default async function PricingPage() {
 
           <section className="rounded-2xl border border-zinc-200 bg-white p-6 dark:border-zinc-800 dark:bg-zinc-950">
             <h2 className="text-sm font-semibold text-zinc-500 dark:text-zinc-400">자율금액구독</h2>
-            <p className="mt-2 text-3xl font-black tracking-tight text-zinc-950 dark:text-zinc-50">
+            <p className="mt-2 text-3xl font-bold text-zinc-950 dark:text-zinc-50">
               원하는 금액<span className="text-sm font-normal text-zinc-500 dark:text-zinc-400"> / 월</span>
             </p>
             <p className="mt-3 text-sm text-zinc-500 dark:text-zinc-400">매달 원하시는 금액으로 자동 결제</p>

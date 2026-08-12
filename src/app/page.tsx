@@ -10,14 +10,14 @@ export default async function LandingPage() {
   return (
     <div className="flex min-h-screen flex-col bg-white dark:bg-black">
       <main className="flex flex-1 flex-col items-center justify-center px-4 py-28 text-center">
-        <span className="rounded-full bg-amber-400/10 px-3.5 py-1.5 text-xs font-semibold tracking-wide text-amber-600 dark:text-amber-400">
+        <span className="rounded-full bg-violet-500/10 px-3.5 py-1.5 text-xs font-semibold tracking-wide text-violet-600 dark:text-violet-400">
           정치 뉴스를 올바르게, 정론관
         </span>
 
-        <h1 className="mt-6 max-w-3xl text-4xl leading-[1.1] font-black tracking-tight text-zinc-950 sm:text-6xl dark:text-white">
+        <h1 className="mt-6 max-w-3xl text-4xl leading-[1.15] font-bold text-zinc-950 sm:text-5xl dark:text-white">
           진보·보수,
           <br />
-          양쪽 입장을 <span className="text-amber-500">한눈에</span>
+          양쪽 입장을 <span className="text-violet-500">한눈에</span>
         </h1>
 
         <p className="mt-6 max-w-md text-base text-zinc-500 sm:text-lg dark:text-zinc-400">

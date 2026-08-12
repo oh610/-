@@ -35,9 +35,9 @@ export default async function ArchiveDetailPage({
       <div className="flex min-h-screen flex-col items-center bg-zinc-50 px-4 py-16 dark:bg-black">
         <main className="w-full max-w-2xl text-center">
           <p className="text-xs text-zinc-500 dark:text-zinc-400">{card.publishedDate}</p>
-          <h1 className="mt-2 text-2xl font-black tracking-tight text-zinc-950 dark:text-zinc-50">{card.issueTitle}</h1>
-          <div className="mt-6 rounded-2xl border border-amber-200 bg-amber-50 p-8 dark:border-amber-900 dark:bg-amber-950/30">
-            <p className="text-sm text-amber-800 dark:text-amber-300">
+          <h1 className="mt-2 text-2xl font-bold text-zinc-950 dark:text-zinc-50">{card.issueTitle}</h1>
+          <div className="mt-6 rounded-2xl border border-violet-200 bg-violet-50 p-8 dark:border-violet-900 dark:bg-violet-950/30">
+            <p className="text-sm text-violet-800 dark:text-violet-300">
               지난 요약은 구독자만 열람할 수 있어요.
             </p>
             <Link href="/pricing" className="btn-primary mt-4">

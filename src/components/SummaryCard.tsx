@@ -84,7 +84,7 @@ export function SummaryCardView({ card }: { card: SummaryCard }) {
         </span>
       </div>
 
-      <h1 className="mt-4 text-2xl font-black tracking-tight leading-snug text-zinc-950 dark:text-zinc-50">
+      <h1 className="mt-4 text-2xl font-bold leading-snug text-zinc-950 dark:text-zinc-50">
         {card.issueTitle}
       </h1>
       <p className="mt-3 text-[15px] leading-relaxed text-zinc-600 dark:text-zinc-400">

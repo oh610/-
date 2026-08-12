@@ -4,7 +4,7 @@ export default function GuidePage() {
   return (
     <div className="flex min-h-screen justify-center bg-zinc-50 px-4 py-16 dark:bg-black">
       <main className="w-full max-w-2xl">
-        <h1 className="text-3xl font-black tracking-tight text-zinc-950 dark:text-zinc-50">사용 방법</h1>
+        <h1 className="text-3xl font-bold text-zinc-950 dark:text-zinc-50">사용 방법</h1>
         <p className="mt-2 text-sm text-zinc-500 dark:text-zinc-400">
           정론관을 이용하는 방법을 안내해 드려요.
         </p>

@@ -32,11 +32,11 @@ export default async function Home() {
     <div className="flex min-h-screen flex-col items-center bg-zinc-50 px-4 py-16 dark:bg-black">
       <main className="flex w-full flex-col items-center gap-6">
         <div className="text-center">
-          <span className="rounded-full bg-amber-400/10 px-3 py-1 text-xs font-semibold tracking-wide text-amber-600 dark:text-amber-400">
+          <span className="rounded-full bg-violet-500/10 px-3 py-1 text-xs font-semibold tracking-wide text-violet-600 dark:text-violet-400">
             {card.publishedDate} 발행
           </span>
-          <h1 className="mt-3 text-3xl font-black tracking-tight text-zinc-950 sm:text-4xl dark:text-white">
-            오늘의 <span className="text-amber-500">진짜 논쟁</span>을 한눈에
+          <h1 className="mt-3 text-3xl font-bold text-zinc-950 sm:text-4xl dark:text-white">
+            오늘의 <span className="text-violet-500">진짜 논쟁</span>을 한눈에
           </h1>
         </div>
         {!dbCard && (
