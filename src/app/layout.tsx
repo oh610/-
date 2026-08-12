@@ -4,6 +4,7 @@ import Link from "next/link";
 import { AuthNav } from "@/components/AuthNav";
 import { MainNav } from "@/components/MainNav";
 import { AdBanner } from "@/components/AdBanner";
+import { BetaNoticePopup } from "@/components/BetaNoticePopup";
 import { createClient } from "@/lib/supabase/server";
 import { hasFullAccess } from "@/lib/access";
 import "./globals.css";
@@ -94,6 +95,7 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
             </Link>
           </div>
         </footer>
+        <BetaNoticePopup />
       </body>
     </html>
   );
