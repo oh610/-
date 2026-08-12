@@ -61,7 +61,7 @@ export default async function Home() {
             Supabase에서 데이터를 가져오지 못해 샘플 데이터를 표시 중입니다. (schema.sql / seed.sql 적용 여부 확인)
           </p>
         )}
-        <DailyCardSlider hasAccess={access} userId={user?.id ?? null} userEmail={user?.email ?? null}>
+        <DailyCardSlider hasAccess={access}>
           <SummaryCardView card={card} />
         </DailyCardSlider>
       </main>
@@ -72,7 +72,7 @@ export default async function Home() {
           ) : (
             <>
               <ReviewPromptPopup />
-              {!access && <SubscribePromptPopup userId={user.id} userEmail={user.email ?? null} />}
+              {!access && <SubscribePromptPopup />}
             </>
           )}
         </>

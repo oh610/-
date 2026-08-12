@@ -1,18 +1,11 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useState } from "react";
-import { CheckoutButton } from "@/components/CheckoutButton";
 
 const STORAGE_KEY = "subscribePromptShown";
-const MONTHLY_PRICE_ID = process.env.NEXT_PUBLIC_PADDLE_PRICE_MONTHLY;
 
-export function SubscribePromptPopup({
-  userId,
-  userEmail,
-}: {
-  userId: string | null;
-  userEmail: string | null;
-}) {
+export function SubscribePromptPopup() {
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
@@ -47,13 +40,9 @@ export function SubscribePromptPopup({
         <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
           광고 없이, 지난 뉴스 요약까지 전부 확인할 수 있어요.
         </p>
-        <CheckoutButton
-          priceId={MONTHLY_PRICE_ID}
-          label="구독하기"
-          userId={userId}
-          userEmail={userEmail}
-          className="btn-primary mt-4 w-full"
-        />
+        <Link href="/pricing" className="btn-primary mt-4 w-full">
+          구독하기
+        </Link>
         <button
           onClick={close}
           className="mt-2 w-full text-xs text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300"
