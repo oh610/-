@@ -1,25 +1,19 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useState } from "react";
-import { CheckoutButton } from "@/components/CheckoutButton";
 
-const STORAGE_KEY = "subscribePromptShown";
-const MONTHLY_PRICE_ID = process.env.NEXT_PUBLIC_PADDLE_PRICE_MONTHLY;
+const STORAGE_KEY = "loginPromptShown";
+const DELAY_MS = 15000;
 
-export function SubscribePromptPopup({
-  userId,
-  userEmail,
-}: {
-  userId: string | null;
-  userEmail: string | null;
-}) {
+export function LoginPromptPopup() {
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
     if (sessionStorage.getItem(STORAGE_KEY)) return;
 
-    const timer = setTimeout(() => setVisible(true), 3000);
+    const timer = setTimeout(() => setVisible(true), DELAY_MS);
     return () => clearTimeout(timer);
   }, []);
 
@@ -40,20 +34,21 @@ export function SubscribePromptPopup({
         >
           ✕
         </button>
-        <span className="text-4xl">🔓</span>
+        <span className="text-4xl">👋</span>
         <h2 className="mt-3 text-base font-semibold text-zinc-900 dark:text-zinc-50">
-          구독하고 더 많은 정치 뉴스를 만나보세요
+          로그인하고 더 많은 기능을 이용해보세요
         </h2>
         <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
-          광고 없이, 지난 뉴스 요약까지 전부 확인할 수 있어요.
+          지난 뉴스 요약, 국회의원 정보, 마이페이지까지 로그인하면 모두 이용할 수 있어요.
         </p>
-        <CheckoutButton
-          priceId={MONTHLY_PRICE_ID}
-          label="구독하기"
-          userId={userId}
-          userEmail={userEmail}
-          className="btn-primary mt-4 w-full"
-        />
+        <div className="mt-4 flex gap-2">
+          <Link href="/login" className="btn-secondary flex-1" onClick={close}>
+            로그인
+          </Link>
+          <Link href="/signup" className="btn-primary flex-1" onClick={close}>
+            회원가입
+          </Link>
+        </div>
         <button
           onClick={close}
           className="mt-2 w-full text-xs text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300"

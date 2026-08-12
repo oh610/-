@@ -25,7 +25,7 @@ export default async function ArchivePage() {
   return (
     <div className="flex min-h-screen flex-col items-center bg-zinc-50 px-4 py-16 dark:bg-black">
       <main className="w-full max-w-2xl">
-        <h1 className="mb-2 text-2xl font-bold text-zinc-900 dark:text-zinc-50">지난 뉴스 요약</h1>
+        <h1 className="mb-2 text-3xl font-black tracking-tight text-zinc-950 dark:text-zinc-50">지난 뉴스 요약</h1>
         <p className="mb-8 text-sm text-zinc-500 dark:text-zinc-400">
           {isSubscriber
             ? "지금까지 발행된 모든 요약카드를 볼 수 있어요."
@@ -39,7 +39,7 @@ export default async function ArchivePage() {
             </span>
             <Link
               href="/pricing"
-              className="shrink-0 rounded-lg bg-amber-600 px-3 py-1.5 font-medium text-white hover:bg-amber-700"
+              className="shrink-0 rounded-full bg-amber-400 px-3.5 py-1.5 font-semibold text-zinc-950 transition hover:bg-amber-300"
             >
               구독하기
             </Link>

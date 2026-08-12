@@ -70,7 +70,7 @@ export function SummaryCardView({ card }: { card: SummaryCard }) {
   const conCitations = card.citations.filter((c) => c.stance === "con");
 
   return (
-    <article className="w-full max-w-2xl rounded-2xl border border-zinc-200 bg-white p-7 shadow-sm sm:p-8 dark:border-zinc-800 dark:bg-zinc-950">
+    <article className="w-full max-w-2xl rounded-2xl border border-zinc-200 bg-white p-7 shadow-sm transition hover:shadow-md sm:p-8 dark:border-zinc-800 dark:bg-zinc-950">
       <div className="flex items-center justify-between text-sm text-zinc-500 dark:text-zinc-400">
         <span>{card.publishedDate}</span>
         <span
@@ -84,7 +84,7 @@ export function SummaryCardView({ card }: { card: SummaryCard }) {
         </span>
       </div>
 
-      <h1 className="mt-4 text-2xl font-bold leading-snug text-zinc-900 dark:text-zinc-50">
+      <h1 className="mt-4 text-2xl font-black tracking-tight leading-snug text-zinc-950 dark:text-zinc-50">
         {card.issueTitle}
       </h1>
       <p className="mt-3 text-[15px] leading-relaxed text-zinc-600 dark:text-zinc-400">

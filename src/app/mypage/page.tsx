@@ -33,7 +33,7 @@ export default async function MyPage() {
   return (
     <div className="flex min-h-screen flex-col items-center bg-zinc-50 px-4 py-16 dark:bg-black">
       <main className="w-full max-w-2xl">
-        <h1 className="mb-8 text-2xl font-bold text-zinc-900 dark:text-zinc-50">마이페이지</h1>
+        <h1 className="mb-8 text-3xl font-black tracking-tight text-zinc-950 dark:text-zinc-50">마이페이지</h1>
 
         <section className="mb-6 rounded-2xl border border-zinc-200 bg-white p-6 dark:border-zinc-800 dark:bg-zinc-950">
           <h2 className="mb-1 text-lg font-semibold text-zinc-900 dark:text-zinc-50">기본 정보</h2>

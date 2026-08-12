@@ -65,11 +65,7 @@ export default function ContactPage() {
 
             {error && <p className="text-sm text-rose-600 dark:text-rose-400">{error}</p>}
 
-            <button
-              type="submit"
-              disabled={loading}
-              className="rounded-lg bg-zinc-900 px-4 py-2 text-white disabled:opacity-50 dark:bg-zinc-100 dark:text-zinc-900"
-            >
+            <button type="submit" disabled={loading} className="btn-primary w-full">
               {loading ? "전송 중..." : "문의 보내기"}
             </button>
           </form>

@@ -2,6 +2,7 @@ import { SummaryCardView } from "@/components/SummaryCard";
 import { DailyCardSlider } from "@/components/DailyCardSlider";
 import { ReviewPromptPopup } from "@/components/ReviewPromptPopup";
 import { SubscribePromptPopup } from "@/components/SubscribePromptPopup";
+import { LoginPromptPopup } from "@/components/LoginPromptPopup";
 import { dummySummaryCard } from "@/lib/dummy-data";
 import { getLatestSummaryCard } from "@/lib/supabase/queries";
 import { createClient } from "@/lib/supabase/server";
@@ -30,9 +31,14 @@ export default async function Home() {
   return (
     <div className="flex min-h-screen flex-col items-center bg-zinc-50 px-4 py-16 dark:bg-black">
       <main className="flex w-full flex-col items-center gap-6">
-        <h1 className="text-lg font-medium text-zinc-500 dark:text-zinc-400">
-          오늘의 정치 뉴스 요약
-        </h1>
+        <div className="text-center">
+          <span className="rounded-full bg-amber-400/10 px-3 py-1 text-xs font-semibold tracking-wide text-amber-600 dark:text-amber-400">
+            {card.publishedDate} 발행
+          </span>
+          <h1 className="mt-3 text-3xl font-black tracking-tight text-zinc-950 sm:text-4xl dark:text-white">
+            오늘의 <span className="text-amber-500">진짜 논쟁</span>을 한눈에
+          </h1>
+        </div>
         {!dbCard && (
           <p className="text-sm text-amber-600 dark:text-amber-400">
             Supabase에서 데이터를 가져오지 못해 샘플 데이터를 표시 중입니다. (schema.sql / seed.sql 적용 여부 확인)
@@ -42,8 +48,14 @@ export default async function Home() {
           <SummaryCardView card={card} />
         </DailyCardSlider>
       </main>
-      <ReviewPromptPopup />
-      {!access && <SubscribePromptPopup userId={user?.id ?? null} userEmail={user?.email ?? null} />}
+      {user ? (
+        <>
+          <ReviewPromptPopup />
+          {!access && <SubscribePromptPopup userId={user.id} userEmail={user.email ?? null} />}
+        </>
+      ) : (
+        <LoginPromptPopup />
+      )}
     </div>
   );
 }

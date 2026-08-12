@@ -80,7 +80,7 @@ export default async function MemberDetailPage({
             )}
             <div className="min-w-0 flex-1">
               <div className="flex items-center justify-between">
-                <h1 className="text-2xl font-bold text-zinc-900 dark:text-zinc-50">{member.name}</h1>
+                <h1 className="text-3xl font-black tracking-tight text-zinc-950 dark:text-zinc-50">{member.name}</h1>
                 {member.ideology && <IdeologyBadge ideology={member.ideology} />}
               </div>
               <p className="mt-1 text-zinc-600 dark:text-zinc-400">

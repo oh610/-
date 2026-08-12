@@ -31,7 +31,7 @@ export async function POST(request: NextRequest) {
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      from: "정치한스푼 문의 <onboarding@resend.dev>",
+      from: "정론관 문의 <onboarding@resend.dev>",
       to: CONTACT_EMAIL,
       ...(user?.email ? { reply_to: user.email } : {}),
       subject: `[문의] ${title}`,

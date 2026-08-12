@@ -35,7 +35,7 @@ export async function POST(request: NextRequest) {
     items: [
       {
         price: {
-          description: "정치한스푼 자율금액구독",
+          description: "정론관 자율금액구독",
           unitPrice: { amount: String(amount), currencyCode: "KRW" },
           billingCycle: { interval: "month", frequency: 1 },
           productId: DONATION_PRODUCT_ID,

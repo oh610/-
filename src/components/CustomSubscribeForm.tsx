@@ -51,7 +51,7 @@ export function CustomSubscribeForm({ userId }: { userId: string | null }) {
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-2">
-      <label className="flex items-center rounded-lg border border-zinc-300 px-3 py-2 dark:border-zinc-700">
+      <label className="flex items-center rounded-xl border border-zinc-300 px-3 py-2.5 transition focus-within:border-amber-400 dark:border-zinc-700">
         <input
           type="number"
           min={1000}
@@ -62,11 +62,7 @@ export function CustomSubscribeForm({ userId }: { userId: string | null }) {
         />
         <span className="ml-1 shrink-0 text-sm text-zinc-500 dark:text-zinc-400">원 / 월</span>
       </label>
-      <button
-        type="submit"
-        disabled={loading}
-        className="w-full rounded-lg bg-zinc-900 px-4 py-2 text-sm font-medium text-white disabled:opacity-50 dark:bg-zinc-100 dark:text-zinc-900"
-      >
+      <button type="submit" disabled={loading} className="btn-primary w-full">
         {loading ? "불러오는 중..." : "자율금액 구독하기"}
       </button>
       {error && <p className="text-sm text-rose-600 dark:text-rose-400">{error}</p>}

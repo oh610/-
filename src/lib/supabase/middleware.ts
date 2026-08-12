@@ -32,6 +32,7 @@ export async function updateSession(request: NextRequest) {
   const isAuthPage = path === "/login" || path === "/signup";
   const publicOnlyPaths = [
     "/",
+    "/home",
     "/forgot-password",
     "/reset-password",
     "/terms",
