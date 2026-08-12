@@ -6,7 +6,7 @@ import { hasFullAccess } from "@/lib/access";
 
 export const metadata: Metadata = {
   title: "요금제",
-  description: "원하는 금액으로 매달 자동 결제되는 자율구독. 광고 없이, 지난 뉴스 요약까지 이용할 수 있어요.",
+  description: "광고 없는 화면과 키워드 검색 요약을 가장 먼저 만나는 자율구독으로 정론관을 응원해 주세요.",
 };
 
 export default async function PricingPage() {
@@ -42,8 +42,8 @@ export default async function PricingPage() {
           {isAdmin
             ? "관리자 계정입니다. 구독 없이도 모든 콘텐츠를 이용할 수 있어요."
             : access
-              ? "현재 유료 구독 중입니다. 광고 없이, 지난 뉴스 요약도 모두 이용하고 계세요."
-              : "무료로도 오늘의 요약을 보실 수 있어요. 광고 없이, 지난 뉴스 요약까지 보시려면 구독해 주세요."}
+              ? "광고 없이 정론관을 이용해 주셔서 감사해요. 앞으로 선보일 키워드 검색 요약도 가장 먼저 만나보실 수 있어요."
+              : "오늘의 요약과 지난 요약 모두 무료로 보실 수 있어요. 광고 없는 화면과 키워드 검색 요약을 가장 먼저 만나고 싶다면 자율구독으로 응원해 주세요."}
         </p>
 
         {discountCouponCode && <DiscountCouponForm code={discountCouponCode} />}
@@ -54,7 +54,20 @@ export default async function PricingPage() {
             원하는 금액<span className="text-sm font-normal text-zinc-500 dark:text-zinc-400"> / 월</span>
           </p>
           <p className="mt-3 text-sm text-zinc-500 dark:text-zinc-400">매달 원하시는 금액으로 자동 결제, 언제든 해지 가능</p>
-          <p className="mt-1 mb-4 text-sm text-zinc-500 dark:text-zinc-400">광고 없이, 지난 요약까지 이용</p>
+          <ul className="mt-4 mb-5 flex flex-col gap-2 text-sm text-zinc-600 dark:text-zinc-400">
+            <li className="flex items-start gap-2">
+              <span aria-hidden>✨</span>
+              <span>광고 없는 깨끗한 화면으로 뉴스를 봐요</span>
+            </li>
+            <li className="flex items-start gap-2">
+              <span aria-hidden>🔍</span>
+              <span>원하는 키워드를 검색해 바로 요약받는 기능을 구독자에게 가장 먼저 열어드려요 (출시 예정)</span>
+            </li>
+            <li className="flex items-start gap-2">
+              <span aria-hidden>💜</span>
+              <span>정론관이 광고 없이도 계속 운영될 수 있도록 돕는 후원이 돼요</span>
+            </li>
+          </ul>
           <CustomSubscribeForm userId={user?.id ?? null} />
         </section>
       </main>
