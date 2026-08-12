@@ -51,6 +51,30 @@ function CitationList({ citations }: { citations: SummaryCardCitation[] }) {
   );
 }
 
+function splitFirstSentence(text: string): { first: string; rest: string } {
+  const match = text.match(/^(.+?[.!?])(\s+|$)/);
+  if (!match) return { first: text, rest: "" };
+  return { first: match[1], rest: text.slice(match[0].length) };
+}
+
+function StanceSummary({ text }: { text: string }) {
+  const { first, rest } = splitFirstSentence(text);
+
+  return (
+    <>
+      <p className="mb-3 inline-block rounded-md bg-amber-200/70 px-2 py-1 text-[15px] font-bold leading-snug text-zinc-900 dark:bg-amber-400/20 dark:text-zinc-50">
+        {first}
+      </p>
+      <p className="text-[15px] leading-relaxed text-zinc-700 dark:text-zinc-300">
+        <mark className="rounded bg-amber-200/70 px-0.5 text-zinc-900 dark:bg-amber-400/25 dark:text-zinc-50">
+          {first}
+        </mark>
+        {rest && ` ${rest}`}
+      </p>
+    </>
+  );
+}
+
 function IdeologyBadge({ ideology }: { ideology: "진보" | "보수" }) {
   return (
     <span
@@ -96,9 +120,7 @@ export function SummaryCardView({ card }: { card: SummaryCard }) {
           <h2 className="mb-3 text-sm font-semibold text-blue-700 dark:text-blue-400">
             찬성(여당) 측 논리
           </h2>
-          <p className="text-[15px] leading-relaxed text-zinc-700 dark:text-zinc-300">
-            {card.proStanceSummary}
-          </p>
+          <StanceSummary text={card.proStanceSummary} />
           <CitationList citations={proCitations} />
         </section>
 
@@ -106,9 +128,7 @@ export function SummaryCardView({ card }: { card: SummaryCard }) {
           <h2 className="mb-3 text-sm font-semibold text-rose-700 dark:text-rose-400">
             반대(야당) 측 논리
           </h2>
-          <p className="text-[15px] leading-relaxed text-zinc-700 dark:text-zinc-300">
-            {card.conStanceSummary}
-          </p>
+          <StanceSummary text={card.conStanceSummary} />
           <CitationList citations={conCitations} />
         </section>
       </div>
