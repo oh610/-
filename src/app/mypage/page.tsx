@@ -1,9 +1,11 @@
+import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { NicknameForm } from "@/components/mypage/NicknameForm";
 import { PasswordChangeForm } from "@/components/mypage/PasswordChangeForm";
 import { UpdatePaymentMethodButton } from "@/components/mypage/UpdatePaymentMethodButton";
 import { DeleteAccountForm } from "@/components/mypage/DeleteAccountForm";
+import { TrialCouponRedeemForm } from "@/components/TrialCouponRedeemForm";
 
 const ACTIVE_STATUSES = new Set(["active", "trialing", "past_due"]);
 
@@ -16,7 +18,9 @@ export default async function MyPage() {
 
   const { data: profile } = await supabase
     .from("users")
-    .select("nickname, tier")
+    .select(
+      "nickname, tier, trial_coupon_code, trial_redeemed_at, trial_expires_at, discount_coupon_code, discount_coupon_redeemed_at",
+    )
     .eq("id", user.id)
     .maybeSingle();
 
@@ -64,6 +68,40 @@ export default async function MyPage() {
             >
               요금제 보러 가기
             </a>
+          )}
+        </section>
+
+        <section className="mb-6 rounded-2xl border border-zinc-200 bg-white p-6 dark:border-zinc-800 dark:bg-zinc-950">
+          <h2 className="mb-1 text-lg font-semibold text-zinc-900 dark:text-zinc-50">쿠폰함</h2>
+
+          {profile?.trial_redeemed_at ? (
+            <p className="mt-3 text-sm text-zinc-600 dark:text-zinc-400">
+              {profile.trial_expires_at && new Date(profile.trial_expires_at) > new Date()
+                ? `체험 이용 중 · ${new Date(profile.trial_expires_at).toLocaleDateString("ko-KR")}까지`
+                : "7일 무료 체험을 이미 사용했어요."}
+            </p>
+          ) : profile?.trial_coupon_code ? (
+            <div className="mt-3">
+              <p className="mb-2 text-sm text-zinc-600 dark:text-zinc-400">
+                7일 무료 체험 쿠폰이 아직 남아있어요. 지금 적용하면 그 순간부터 일주일간 유료 기능을 이용할 수 있어요.
+              </p>
+              <TrialCouponRedeemForm code={profile.trial_coupon_code} />
+            </div>
+          ) : null}
+
+          {profile?.discount_coupon_code && (
+            <div className="mt-4 border-t border-zinc-200 pt-4 dark:border-zinc-800">
+              {profile.discount_coupon_redeemed_at ? (
+                <p className="text-sm text-zinc-600 dark:text-zinc-400">20% 할인 쿠폰을 이미 사용했어요.</p>
+              ) : (
+                <p className="text-sm text-zinc-600 dark:text-zinc-400">
+                  20% 할인(3개월) 쿠폰이 도착했어요.{" "}
+                  <Link href="/pricing" className="font-medium text-violet-600 hover:underline dark:text-violet-400">
+                    요금제에서 사용하기
+                  </Link>
+                </p>
+              )}
+            </div>
           )}
         </section>
 

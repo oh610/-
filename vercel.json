@@ -3,6 +3,10 @@
     {
       "path": "/api/cron/generate-summary",
       "schedule": "0 0 * * *"
+    },
+    {
+      "path": "/api/cron/coupons",
+      "schedule": "15 0 * * *"
     }
   ]
 }

@@ -13,12 +13,18 @@ export default async function ArchivePage() {
 
   let tier: string | null = null;
   let isAdmin = false;
+  let trialExpiresAt: string | null = null;
   if (user) {
-    const { data } = await supabase.from("users").select("tier, is_admin").eq("id", user.id).maybeSingle();
+    const { data } = await supabase
+      .from("users")
+      .select("tier, is_admin, trial_expires_at")
+      .eq("id", user.id)
+      .maybeSingle();
     tier = data?.tier ?? null;
     isAdmin = data?.is_admin ?? false;
+    trialExpiresAt = data?.trial_expires_at ?? null;
   }
-  const isSubscriber = hasFullAccess(tier, isAdmin);
+  const isSubscriber = hasFullAccess(tier, isAdmin, trialExpiresAt);
 
   const cards = await getAllSummaryCards();
 

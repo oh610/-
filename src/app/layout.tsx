@@ -40,17 +40,19 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
   let tier: string | null = null;
   let nickname: string | null = null;
   let isAdmin = false;
+  let trialExpiresAt: string | null = null;
   if (user) {
     const { data } = await supabase
       .from("users")
-      .select("tier, nickname, is_admin")
+      .select("tier, nickname, is_admin, trial_expires_at")
       .eq("id", user.id)
       .maybeSingle();
     tier = data?.tier ?? null;
     nickname = data?.nickname ?? null;
     isAdmin = data?.is_admin ?? false;
+    trialExpiresAt = data?.trial_expires_at ?? null;
   }
-  const showAd = ADFIT_UNIT_ID && !hasFullAccess(tier, isAdmin);
+  const showAd = ADFIT_UNIT_ID && !hasFullAccess(tier, isAdmin, trialExpiresAt);
 
   return (
     <html

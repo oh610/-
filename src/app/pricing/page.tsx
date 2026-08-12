@@ -1,6 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { CheckoutButton } from "@/components/CheckoutButton";
 import { CustomSubscribeForm } from "@/components/CustomSubscribeForm";
+import { DiscountCouponForm } from "@/components/DiscountCouponForm";
 import { hasFullAccess } from "@/lib/access";
 
 const MONTHLY_PRICE_ID = process.env.NEXT_PUBLIC_PADDLE_PRICE_MONTHLY;
@@ -14,11 +15,22 @@ export default async function PricingPage() {
 
   let tier: string | null = null;
   let isAdmin = false;
+  let trialExpiresAt: string | null = null;
+  let discountCouponCode: string | null = null;
   if (user) {
-    const { data } = await supabase.from("users").select("tier, is_admin").eq("id", user.id).maybeSingle();
+    const { data } = await supabase
+      .from("users")
+      .select("tier, is_admin, trial_expires_at, discount_coupon_code, discount_coupon_redeemed_at")
+      .eq("id", user.id)
+      .maybeSingle();
     tier = data?.tier ?? null;
     isAdmin = data?.is_admin ?? false;
+    trialExpiresAt = data?.trial_expires_at ?? null;
+    if (data?.discount_coupon_code && !data.discount_coupon_redeemed_at) {
+      discountCouponCode = data.discount_coupon_code;
+    }
   }
+  const access = hasFullAccess(tier, isAdmin, trialExpiresAt);
 
   const buttonClass = "btn-primary mt-4 w-full";
 
@@ -26,13 +38,15 @@ export default async function PricingPage() {
     <div className="flex min-h-screen flex-col items-center bg-zinc-50 px-4 py-16 dark:bg-black">
       <main className="w-full max-w-4xl">
         <h1 className="mb-2 text-3xl font-bold text-zinc-950 dark:text-zinc-50">요금제</h1>
-        <p className="mb-10 text-sm text-zinc-500 dark:text-zinc-400">
+        <p className="mb-6 text-sm text-zinc-500 dark:text-zinc-400">
           {isAdmin
             ? "관리자 계정입니다. 구독 없이도 모든 콘텐츠를 이용할 수 있어요."
-            : hasFullAccess(tier, isAdmin)
+            : access
               ? "현재 유료 구독 중입니다. 광고 없이, 지난 뉴스 요약도 모두 이용하고 계세요."
               : "무료로도 오늘의 요약을 보실 수 있어요. 광고 없이, 지난 뉴스 요약까지 보시려면 구독해 주세요."}
         </p>
+
+        {discountCouponCode && <DiscountCouponForm code={discountCouponCode} />}
 
         <div className="grid gap-5 sm:grid-cols-3">
           <section className="rounded-2xl border border-zinc-200 bg-white p-6 dark:border-zinc-800 dark:bg-zinc-950">

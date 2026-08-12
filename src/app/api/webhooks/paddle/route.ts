@@ -45,6 +45,8 @@ export async function POST(request: NextRequest) {
         break;
       }
       const isCustom = sub.customData?.kind === "custom";
+      const isDiscount = sub.customData?.kind === "discount";
+      const discountUntil = sub.customData?.discountUntil as string | undefined;
 
       const { error: subError } = await supabaseAdmin.from("subscriptions").upsert(
         {
@@ -52,9 +54,10 @@ export async function POST(request: NextRequest) {
           payment_provider: "paddle",
           provider_customer_id: sub.customerId,
           provider_subscription_id: sub.id,
-          plan: mapPlan(sub.billingCycle?.interval, isCustom),
+          plan: mapPlan(sub.billingCycle?.interval, isCustom || isDiscount),
           status: sub.status,
           current_period_end: sub.currentBillingPeriod?.endsAt ?? null,
+          discount_expires_at: isDiscount && discountUntil ? discountUntil : null,
           updated_at: new Date().toISOString(),
         },
         { onConflict: "provider_subscription_id" },
@@ -66,6 +69,14 @@ export async function POST(request: NextRequest) {
         .update({ tier: ACTIVE_STATUSES.has(sub.status) ? "유료" : "무료" })
         .eq("id", userId);
       if (userError) throw userError;
+
+      if (isDiscount && ACTIVE_STATUSES.has(sub.status)) {
+        await supabaseAdmin
+          .from("users")
+          .update({ discount_coupon_redeemed_at: new Date().toISOString() })
+          .eq("id", userId)
+          .is("discount_coupon_redeemed_at", null);
+      }
       break;
     }
 

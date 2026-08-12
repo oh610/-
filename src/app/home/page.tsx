@@ -3,6 +3,7 @@ import { DailyCardSlider } from "@/components/DailyCardSlider";
 import { ReviewPromptPopup } from "@/components/ReviewPromptPopup";
 import { SubscribePromptPopup } from "@/components/SubscribePromptPopup";
 import { LoginPromptPopup } from "@/components/LoginPromptPopup";
+import { TrialCouponPopup } from "@/components/TrialCouponPopup";
 import { dummySummaryCard } from "@/lib/dummy-data";
 import { getLatestSummaryCard } from "@/lib/supabase/queries";
 import { createClient } from "@/lib/supabase/server";
@@ -21,12 +22,22 @@ export default async function Home() {
 
   let tier: string | null = null;
   let isAdmin = false;
+  let trialExpiresAt: string | null = null;
+  let trialCouponCode: string | null = null;
+  let showTrialCouponPopup = false;
   if (user) {
-    const { data } = await supabase.from("users").select("tier, is_admin").eq("id", user.id).maybeSingle();
+    const { data } = await supabase
+      .from("users")
+      .select("tier, is_admin, trial_expires_at, trial_coupon_code, trial_coupon_shown_at, trial_redeemed_at")
+      .eq("id", user.id)
+      .maybeSingle();
     tier = data?.tier ?? null;
     isAdmin = data?.is_admin ?? false;
+    trialExpiresAt = data?.trial_expires_at ?? null;
+    trialCouponCode = data?.trial_coupon_code ?? null;
+    showTrialCouponPopup = !!trialCouponCode && !data?.trial_coupon_shown_at && !data?.trial_redeemed_at;
   }
-  const access = hasFullAccess(tier, isAdmin);
+  const access = hasFullAccess(tier, isAdmin, trialExpiresAt);
 
   return (
     <div className="flex min-h-screen flex-col items-center bg-zinc-50 px-4 py-16 dark:bg-black">
@@ -50,8 +61,14 @@ export default async function Home() {
       </main>
       {user ? (
         <>
-          <ReviewPromptPopup />
-          {!access && <SubscribePromptPopup userId={user.id} userEmail={user.email ?? null} />}
+          {showTrialCouponPopup && trialCouponCode ? (
+            <TrialCouponPopup code={trialCouponCode} />
+          ) : (
+            <>
+              <ReviewPromptPopup />
+              {!access && <SubscribePromptPopup userId={user.id} userEmail={user.email ?? null} />}
+            </>
+          )}
         </>
       ) : (
         <LoginPromptPopup />

@@ -267,7 +267,7 @@ language plpgsql
 security definer set search_path = public
 as $$
 begin
-  insert into public.users (id, email, nickname)
+  insert into public.users (id, email, nickname, trial_coupon_code)
   values (
     new.id,
     new.email,
@@ -275,7 +275,8 @@ begin
       new.raw_user_meta_data->>'nickname',
       new.raw_user_meta_data->>'full_name',
       new.raw_user_meta_data->>'name'
-    )
+    ),
+    upper(substr(md5(random()::text || new.id::text), 1, 8))
   );
   return new;
 end;
@@ -377,3 +378,17 @@ alter table bills add column if not exists assembly_bill_id text;
 -- ========================================
 
 alter table users add column if not exists is_admin boolean not null default false;
+
+-- ========================================
+-- 체험 쿠폰(7일 무료 체험) + 할인 쿠폰(체험 종료 시 20% 3개월 할인)
+-- ========================================
+
+alter table users add column if not exists trial_coupon_code text;
+alter table users add column if not exists trial_coupon_shown_at timestamptz;
+alter table users add column if not exists trial_redeemed_at timestamptz;
+alter table users add column if not exists trial_expires_at timestamptz;
+alter table users add column if not exists discount_coupon_code text;
+alter table users add column if not exists discount_coupon_issued_at timestamptz;
+alter table users add column if not exists discount_coupon_redeemed_at timestamptz;
+
+alter table subscriptions add column if not exists discount_expires_at timestamptz;

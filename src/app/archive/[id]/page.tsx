@@ -24,13 +24,19 @@ export default async function ArchiveDetailPage({
 
   let tier: string | null = null;
   let isAdmin = false;
+  let trialExpiresAt: string | null = null;
   if (user) {
-    const { data } = await supabase.from("users").select("tier, is_admin").eq("id", user.id).maybeSingle();
+    const { data } = await supabase
+      .from("users")
+      .select("tier, is_admin, trial_expires_at")
+      .eq("id", user.id)
+      .maybeSingle();
     tier = data?.tier ?? null;
     isAdmin = data?.is_admin ?? false;
+    trialExpiresAt = data?.trial_expires_at ?? null;
   }
 
-  if (!hasFullAccess(tier, isAdmin)) {
+  if (!hasFullAccess(tier, isAdmin, trialExpiresAt)) {
     return (
       <div className="flex min-h-screen flex-col items-center bg-zinc-50 px-4 py-16 dark:bg-black">
         <main className="w-full max-w-2xl text-center">
