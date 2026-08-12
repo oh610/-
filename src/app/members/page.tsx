@@ -1,10 +1,12 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { searchMembers, getDistrictOptions, getTopActiveMembers, formatDistrictName } from "@/lib/supabase/members";
+import { getRecentBills, getHotBills } from "@/lib/supabase/bills";
 import { createClient } from "@/lib/supabase/server";
 import { LoginPromptPopup } from "@/components/LoginPromptPopup";
 import { DistrictFilter } from "@/components/DistrictFilter";
 import { TopActiveMembersPanel } from "@/components/TopActiveMembersPanel";
+import { BillRankPanel } from "@/components/BillRankPanel";
 
 export const dynamic = "force-dynamic";
 
@@ -33,10 +35,12 @@ export default async function MembersPage({
   searchParams: Promise<{ q?: string; region?: string; district?: string }>;
 }) {
   const { q = "", region, district } = await searchParams;
-  const [members, districtOptions, topActiveMembers] = await Promise.all([
+  const [members, districtOptions, topActiveMembers, recentBills, hotBills] = await Promise.all([
     searchMembers(q, region, district),
     getDistrictOptions(),
-    getTopActiveMembers(),
+    getTopActiveMembers(10, 30),
+    getRecentBills(5),
+    getHotBills(5, 15),
   ]);
 
   const supabase = await createClient();
@@ -46,7 +50,7 @@ export default async function MembersPage({
 
   return (
     <div className="min-h-screen bg-zinc-50 px-4 py-16 dark:bg-black">
-      <div className="mx-auto flex w-full max-w-5xl flex-col gap-6 lg:flex-row lg:items-start">
+      <div className="mx-auto flex w-full max-w-7xl flex-col gap-6 lg:flex-row lg:items-start">
         <main className="flex w-full min-w-0 max-w-2xl flex-1 flex-col gap-6">
           <h1 className="text-lg font-medium text-zinc-500 dark:text-zinc-400">국회의원 검색</h1>
 
@@ -105,7 +109,30 @@ export default async function MembersPage({
           </ul>
         </main>
 
-        <aside className="w-full shrink-0 lg:w-72">
+        <aside className="flex w-full shrink-0 flex-col gap-6 lg:order-first lg:w-64">
+          <BillRankPanel
+            icon="🆕"
+            heading="최근 발의 법안 TOP 5"
+            items={recentBills.map((b) => ({
+              id: b.id,
+              title: b.title,
+              assemblyBillId: b.assemblyBillId,
+              sub: `${b.proposedDate} · ${b.sponsorName ?? "대표발의자 미상"}`,
+            }))}
+          />
+          <BillRankPanel
+            icon="📰"
+            heading="화제의 법안 TOP 5"
+            items={hotBills.map((b) => ({
+              id: b.id,
+              title: b.title,
+              assemblyBillId: b.assemblyBillId,
+              sub: `언론 언급 ${b.mentionCount.toLocaleString()}건`,
+            }))}
+          />
+        </aside>
+
+        <aside className="w-full shrink-0 lg:w-64">
           <TopActiveMembersPanel members={topActiveMembers} />
         </aside>
       </div>

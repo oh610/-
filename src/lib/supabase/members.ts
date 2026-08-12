@@ -92,53 +92,52 @@ export type TopActiveMember = {
   partyName: string | null;
   ideology: "진보" | "보수" | null;
   photoUrl: string | null;
-  latestActivityLabel: string;
+  activityCount: number;
 };
 
-export async function getTopActiveMembers(limit = 10): Promise<TopActiveMember[]> {
+export async function getTopActiveMembers(limit = 10, days = 30): Promise<TopActiveMember[]> {
+  const sinceMs = Date.now() - days * 24 * 60 * 60 * 1000;
+
   const [sponsoredRes, coSponsoredRes, votesRes] = await Promise.all([
     supabase
       .from("bills")
-      .select("main_sponsor_id, proposed_date, title")
+      .select("main_sponsor_id, proposed_date")
       .not("main_sponsor_id", "is", null)
       .order("proposed_date", { ascending: false })
-      .limit(300),
+      .limit(500),
     supabase
       .from("bill_sponsors")
-      .select("member_id, bills(proposed_date, title)")
+      .select("member_id, bills(proposed_date)")
       .order("proposed_date", { foreignTable: "bills", ascending: false })
-      .limit(300),
+      .limit(500),
     supabase
       .from("votes")
-      .select("member_id, voted_at, bills(title)")
+      .select("member_id, voted_at")
       .order("voted_at", { ascending: false })
-      .limit(300),
+      .limit(500),
   ]);
 
-  const latestByMember = new Map<string, { date: string; label: string }>();
+  const countByMember = new Map<string, number>();
 
-  function consider(memberId: string | null | undefined, date: string | null | undefined, label: string) {
+  function bump(memberId: string | null | undefined, date: string | null | undefined) {
     if (!memberId || !date) return;
-    const current = latestByMember.get(memberId);
-    if (!current || date > current.date) {
-      latestByMember.set(memberId, { date, label });
-    }
+    if (new Date(date).getTime() < sinceMs) return;
+    countByMember.set(memberId, (countByMember.get(memberId) ?? 0) + 1);
   }
 
   for (const b of sponsoredRes.data ?? []) {
-    consider(b.main_sponsor_id, b.proposed_date, `'${b.title}' 대표발의`);
+    bump(b.main_sponsor_id, b.proposed_date);
   }
   for (const row of coSponsoredRes.data ?? []) {
     const bill = Array.isArray(row.bills) ? row.bills[0] : row.bills;
-    if (bill) consider(row.member_id, bill.proposed_date, `'${bill.title}' 공동발의`);
+    bump(row.member_id, bill?.proposed_date ?? null);
   }
   for (const v of votesRes.data ?? []) {
-    const bill = Array.isArray(v.bills) ? v.bills[0] : v.bills;
-    consider(v.member_id, v.voted_at, bill ? `'${bill.title}' 표결` : "표결 참여");
+    bump(v.member_id, v.voted_at);
   }
 
-  const topIds = [...latestByMember.entries()]
-    .sort((a, b) => (a[1].date < b[1].date ? 1 : -1))
+  const topIds = [...countByMember.entries()]
+    .sort((a, b) => b[1] - a[1])
     .slice(0, limit)
     .map(([id]) => id);
 
@@ -159,8 +158,8 @@ export async function getTopActiveMembers(limit = 10): Promise<TopActiveMember[]
   return topIds
     .map((id) => {
       const m = memberMap.get(id);
-      const activity = latestByMember.get(id);
-      if (!m || !activity) return null;
+      const count = countByMember.get(id);
+      if (!m || !count) return null;
       const party = toParty(m.parties as PartyRef);
       const result: TopActiveMember = {
         id,
@@ -168,7 +167,7 @@ export async function getTopActiveMembers(limit = 10): Promise<TopActiveMember[]
         partyName: party?.name ?? null,
         ideology: party?.ideology ?? null,
         photoUrl: m.photo_url,
-        latestActivityLabel: activity.label,
+        activityCount: count,
       };
       return result;
     })

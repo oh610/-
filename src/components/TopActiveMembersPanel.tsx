@@ -9,7 +9,7 @@ export function TopActiveMembersPanel({ members }: { members: TopActiveMember[] 
   return (
     <div className="rounded-2xl border border-zinc-200 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-950 lg:sticky lg:top-20">
       <h2 className="mb-4 flex items-center gap-1.5 text-sm font-semibold text-zinc-900 dark:text-zinc-50">
-        <span aria-hidden>🔥</span> 실시간 활동 TOP 10
+        <span aria-hidden>🔥</span> 최근 30일 활동 TOP 10
       </h2>
       <ol className="flex flex-col gap-1">
         {members.map((m, i) => (
@@ -47,7 +47,7 @@ export function TopActiveMembersPanel({ members }: { members: TopActiveMember[] 
                   )}
                 </p>
                 <p className="truncate text-xs text-zinc-500 dark:text-zinc-400">
-                  {m.latestActivityLabel}
+                  최근 30일 활동 {m.activityCount}건
                 </p>
               </div>
             </Link>
