@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { getAllSummaryCards } from "@/lib/supabase/queries";
-import { hasFullAccess } from "@/lib/access";
 import { LoginPromptPopup } from "@/components/LoginPromptPopup";
 
 export const dynamic = "force-dynamic";
@@ -18,21 +17,6 @@ export default async function ArchivePage() {
     data: { user },
   } = await supabase.auth.getUser();
 
-  let tier: string | null = null;
-  let isAdmin = false;
-  let trialExpiresAt: string | null = null;
-  if (user) {
-    const { data } = await supabase
-      .from("users")
-      .select("tier, is_admin, trial_expires_at")
-      .eq("id", user.id)
-      .maybeSingle();
-    tier = data?.tier ?? null;
-    isAdmin = data?.is_admin ?? false;
-    trialExpiresAt = data?.trial_expires_at ?? null;
-  }
-  const isSubscriber = hasFullAccess(tier, isAdmin, trialExpiresAt);
-
   const cards = await getAllSummaryCards();
 
   return (
@@ -40,24 +24,8 @@ export default async function ArchivePage() {
       <main className="w-full max-w-2xl">
         <h1 className="mb-2 text-3xl font-bold text-zinc-950 dark:text-zinc-50">지난 뉴스 요약</h1>
         <p className="mb-8 text-sm text-zinc-500 dark:text-zinc-400">
-          {isSubscriber
-            ? "지금까지 발행된 모든 요약카드를 볼 수 있어요."
-            : "목록은 누구나 볼 수 있지만, 내용을 열람하려면 구독이 필요해요."}
+          지금까지 발행된 모든 요약카드를 볼 수 있어요.
         </p>
-
-        {!isSubscriber && (
-          <div className="mb-6 flex items-center justify-between rounded-xl border border-violet-200 bg-violet-50 px-4 py-3 text-sm dark:border-violet-900 dark:bg-violet-950/30">
-            <span className="text-violet-800 dark:text-violet-300">
-              구독하면 지난 요약을 전부 열람할 수 있어요.
-            </span>
-            <Link
-              href="/pricing"
-              className="shrink-0 rounded-full bg-violet-600 px-3.5 py-1.5 font-semibold text-white transition hover:bg-violet-500"
-            >
-              구독하기
-            </Link>
-          </div>
-        )}
 
         {cards.length === 0 ? (
           <p className="text-sm text-zinc-500 dark:text-zinc-400">아직 발행된 요약카드가 없습니다.</p>
@@ -75,9 +43,6 @@ export default async function ArchivePage() {
                       {card.issueTitle}
                     </p>
                   </div>
-                  {!isSubscriber && (
-                    <span className="shrink-0 text-xs text-zinc-400 dark:text-zinc-500">🔒 구독 전용</span>
-                  )}
                 </Link>
               </li>
             ))}
