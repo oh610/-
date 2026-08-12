@@ -21,9 +21,30 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://polispoon.vercel.app";
+const SITE_DESCRIPTION =
+  "매일 하나의 정치 이슈를 골라 여당·야당의 논리를 나란히 비교하는 정치 뉴스 요약 서비스, 정론관.";
+
 export const metadata: Metadata = {
-  title: "정론관",
-  description: "진보·보수 양쪽 입장을 한눈에 비교하는 정치 뉴스 요약 서비스",
+  metadataBase: new URL(SITE_URL),
+  title: {
+    default: "정론관 | 진보·보수 양쪽 입장을 한눈에",
+    template: "%s | 정론관",
+  },
+  description: SITE_DESCRIPTION,
+  openGraph: {
+    type: "website",
+    locale: "ko_KR",
+    siteName: "정론관",
+    title: "정론관 | 진보·보수 양쪽 입장을 한눈에",
+    description: SITE_DESCRIPTION,
+    url: SITE_URL,
+  },
+  twitter: {
+    card: "summary",
+    title: "정론관 | 진보·보수 양쪽 입장을 한눈에",
+    description: SITE_DESCRIPTION,
+  },
 };
 
 export const viewport: Viewport = {

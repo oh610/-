@@ -1,7 +1,13 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { searchMembers } from "@/lib/supabase/members";
 
 export const dynamic = "force-dynamic";
+
+export const metadata: Metadata = {
+  title: "국회의원 활동",
+  description: "국회의원 프로필, 발의 법안, 표결 이력을 검색해 보세요.",
+};
 
 function IdeologyBadge({ ideology }: { ideology: "진보" | "보수" }) {
   return (

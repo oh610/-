@@ -40,11 +40,14 @@ export async function updateSession(request: NextRequest) {
     "/pricing",
     "/guide",
     "/contact",
+    "/robots.txt",
+    "/sitemap.xml",
   ];
   const isPublicPage =
     isAuthPage ||
     publicOnlyPaths.includes(path) ||
     path.startsWith("/members") ||
+    path.startsWith("/archive") ||
     path.startsWith("/auth/") ||
     path.startsWith("/api/webhooks/") ||
     path.startsWith("/api/cron/");

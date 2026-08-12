@@ -1,9 +1,15 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { getAllSummaryCards } from "@/lib/supabase/queries";
 import { hasFullAccess } from "@/lib/access";
 
 export const dynamic = "force-dynamic";
+
+export const metadata: Metadata = {
+  title: "지난 뉴스 요약",
+  description: "그동안 발행된 정치 이슈 요약카드를 모아봤어요.",
+};
 
 export default async function ArchivePage() {
   const supabase = await createClient();

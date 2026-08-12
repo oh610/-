@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { SummaryCardView } from "@/components/SummaryCard";
 import { DailyCardSlider } from "@/components/DailyCardSlider";
 import { ReviewPromptPopup } from "@/components/ReviewPromptPopup";
@@ -10,6 +11,11 @@ import { createClient } from "@/lib/supabase/server";
 import { hasFullAccess } from "@/lib/access";
 
 export const dynamic = "force-dynamic";
+
+export const metadata: Metadata = {
+  title: "오늘의 요약",
+  description: "오늘의 정치 이슈를 여당·야당 입장으로 나란히 비교해 드려요.",
+};
 
 export default async function Home() {
   const dbCard = await getLatestSummaryCard();

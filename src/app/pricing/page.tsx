@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
 import { CheckoutButton } from "@/components/CheckoutButton";
 import { CustomSubscribeForm } from "@/components/CustomSubscribeForm";
@@ -6,6 +7,11 @@ import { hasFullAccess } from "@/lib/access";
 
 const MONTHLY_PRICE_ID = process.env.NEXT_PUBLIC_PADDLE_PRICE_MONTHLY;
 const ANNUAL_PRICE_ID = process.env.NEXT_PUBLIC_PADDLE_PRICE_ANNUAL;
+
+export const metadata: Metadata = {
+  title: "요금제",
+  description: "월간·연간·자율금액구독 중 골라보세요. 광고 없이, 지난 뉴스 요약까지 이용할 수 있어요.",
+};
 
 export default async function PricingPage() {
   const supabase = await createClient();

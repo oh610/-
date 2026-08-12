@@ -1,9 +1,25 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getMemberDetail } from "@/lib/supabase/members";
 import { searchNews, type NaverNewsItem } from "@/lib/collectors/naver-news";
 
 export const dynamic = "force-dynamic";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}): Promise<Metadata> {
+  const { id } = await params;
+  const member = await getMemberDetail(id);
+  if (!member) return {};
+
+  return {
+    title: `${member.name} 의원`,
+    description: `${member.name} 의원(${member.partyName ?? "무소속"})의 발의 법안, 표결 이력, 관련 뉴스를 확인해 보세요.`,
+  };
+}
 
 function IdeologyBadge({ ideology }: { ideology: "진보" | "보수" }) {
   return (

@@ -1,4 +1,10 @@
+import type { Metadata } from "next";
 import Link from "next/link";
+
+export const metadata: Metadata = {
+  title: "사용 방법",
+  description: "정론관을 이용하는 방법을 안내해 드려요.",
+};
 
 export default function GuidePage() {
   return (
