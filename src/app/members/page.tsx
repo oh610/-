@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { searchMembers, getDistrictOptions, formatDistrictName } from "@/lib/supabase/members";
+import { searchMembers, getDistrictOptions, getTopActiveMembers, formatDistrictName } from "@/lib/supabase/members";
 import { createClient } from "@/lib/supabase/server";
 import { LoginPromptPopup } from "@/components/LoginPromptPopup";
 import { DistrictFilter } from "@/components/DistrictFilter";
+import { TopActiveMembersPanel } from "@/components/TopActiveMembersPanel";
 
 export const dynamic = "force-dynamic";
 
@@ -32,9 +33,10 @@ export default async function MembersPage({
   searchParams: Promise<{ q?: string; region?: string; district?: string }>;
 }) {
   const { q = "", region, district } = await searchParams;
-  const [members, districtOptions] = await Promise.all([
+  const [members, districtOptions, topActiveMembers] = await Promise.all([
     searchMembers(q, region, district),
     getDistrictOptions(),
+    getTopActiveMembers(),
   ]);
 
   const supabase = await createClient();
@@ -44,63 +46,69 @@ export default async function MembersPage({
 
   return (
     <div className="min-h-screen bg-zinc-50 px-4 py-16 dark:bg-black">
-      <main className="mx-auto flex w-full max-w-2xl flex-col gap-6">
-        <h1 className="text-lg font-medium text-zinc-500 dark:text-zinc-400">국회의원 검색</h1>
+      <div className="mx-auto flex w-full max-w-5xl flex-col gap-6 lg:flex-row lg:items-start">
+        <main className="flex w-full min-w-0 max-w-2xl flex-1 flex-col gap-6">
+          <h1 className="text-lg font-medium text-zinc-500 dark:text-zinc-400">국회의원 검색</h1>
 
-        <form className="flex gap-2">
-          <input
-            type="text"
-            name="q"
-            defaultValue={q}
-            placeholder="이름으로 검색"
-            className="flex-1 rounded-lg border border-zinc-300 bg-white px-4 py-2 text-zinc-900 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
-          />
-          {region && <input type="hidden" name="region" value={region} />}
-          {district && <input type="hidden" name="district" value={district} />}
-          <button type="submit" className="btn-primary">
-            검색
-          </button>
-        </form>
+          <form className="flex gap-2">
+            <input
+              type="text"
+              name="q"
+              defaultValue={q}
+              placeholder="이름으로 검색"
+              className="flex-1 rounded-lg border border-zinc-300 bg-white px-4 py-2 text-zinc-900 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
+            />
+            {region && <input type="hidden" name="region" value={region} />}
+            {district && <input type="hidden" name="district" value={district} />}
+            <button type="submit" className="btn-primary">
+              검색
+            </button>
+          </form>
 
-        <DistrictFilter districts={districtOptions} />
+          <DistrictFilter districts={districtOptions} />
 
-        <ul className="flex flex-col gap-3">
-          {members.map((m) => (
-            <li key={m.id}>
-              <Link
-                href={`/members/${m.id}`}
-                className="flex items-center gap-3 rounded-xl border border-zinc-200 bg-white p-4 hover:border-zinc-400 dark:border-zinc-800 dark:bg-zinc-950"
-              >
-                {m.photoUrl ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img
-                    src={m.photoUrl}
-                    alt={`${m.name} 의원 사진`}
-                    className="h-10 w-10 shrink-0 rounded-full object-cover"
-                  />
-                ) : (
-                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-zinc-100 text-sm font-semibold text-zinc-400 dark:bg-zinc-800 dark:text-zinc-600">
-                    {m.name.slice(0, 1)}
+          <ul className="flex flex-col gap-3">
+            {members.map((m) => (
+              <li key={m.id}>
+                <Link
+                  href={`/members/${m.id}`}
+                  className="flex items-center gap-3 rounded-xl border border-zinc-200 bg-white p-4 hover:border-zinc-400 dark:border-zinc-800 dark:bg-zinc-950"
+                >
+                  {m.photoUrl ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={m.photoUrl}
+                      alt={`${m.name} 의원 사진`}
+                      className="h-10 w-10 shrink-0 rounded-full object-cover"
+                    />
+                  ) : (
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-zinc-100 text-sm font-semibold text-zinc-400 dark:bg-zinc-800 dark:text-zinc-600">
+                      {m.name.slice(0, 1)}
+                    </div>
+                  )}
+                  <div className="min-w-0 flex-1">
+                    <p className="font-semibold text-zinc-900 dark:text-zinc-50">{m.name}</p>
+                    <p className="text-sm text-zinc-500 dark:text-zinc-400">
+                      {m.partyName ?? "무소속"} ·{" "}
+                      {m.districtType === "지역구" && m.districtName
+                        ? formatDistrictName(m.districtName)
+                        : "비례대표"}
+                    </p>
                   </div>
-                )}
-                <div className="min-w-0 flex-1">
-                  <p className="font-semibold text-zinc-900 dark:text-zinc-50">{m.name}</p>
-                  <p className="text-sm text-zinc-500 dark:text-zinc-400">
-                    {m.partyName ?? "무소속"} ·{" "}
-                    {m.districtType === "지역구" && m.districtName
-                      ? formatDistrictName(m.districtName)
-                      : "비례대표"}
-                  </p>
-                </div>
-                {m.ideology && <IdeologyBadge ideology={m.ideology} />}
-              </Link>
-            </li>
-          ))}
-          {members.length === 0 && (
-            <p className="text-sm text-zinc-500 dark:text-zinc-400">검색 결과가 없습니다.</p>
-          )}
-        </ul>
-      </main>
+                  {m.ideology && <IdeologyBadge ideology={m.ideology} />}
+                </Link>
+              </li>
+            ))}
+            {members.length === 0 && (
+              <p className="text-sm text-zinc-500 dark:text-zinc-400">검색 결과가 없습니다.</p>
+            )}
+          </ul>
+        </main>
+
+        <aside className="w-full shrink-0 lg:w-72">
+          <TopActiveMembersPanel members={topActiveMembers} />
+        </aside>
+      </div>
       {!user && <LoginPromptPopup />}
     </div>
   );
