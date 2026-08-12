@@ -44,6 +44,7 @@ export async function updateSession(request: NextRequest) {
   const isPublicPage =
     isAuthPage ||
     publicOnlyPaths.includes(path) ||
+    path.startsWith("/members") ||
     path.startsWith("/auth/") ||
     path.startsWith("/api/webhooks/") ||
     path.startsWith("/api/cron/");
