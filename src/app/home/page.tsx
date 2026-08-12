@@ -6,7 +6,7 @@ import { SubscribePromptPopup } from "@/components/SubscribePromptPopup";
 import { LoginPromptPopup } from "@/components/LoginPromptPopup";
 import { TrialCouponPopup } from "@/components/TrialCouponPopup";
 import { dummySummaryCard } from "@/lib/dummy-data";
-import { getLatestSummaryCard } from "@/lib/supabase/queries";
+import { getLatestSummaryCard, getPastSummaryCards } from "@/lib/supabase/queries";
 import { createClient } from "@/lib/supabase/server";
 import { hasFullAccess } from "@/lib/access";
 
@@ -20,6 +20,7 @@ export const metadata: Metadata = {
 export default async function Home() {
   const dbCard = await getLatestSummaryCard();
   const card = dbCard ?? dummySummaryCard;
+  const pastCards = dbCard ? await getPastSummaryCards(dbCard.id) : [];
 
   const supabase = await createClient();
   const {
@@ -61,7 +62,7 @@ export default async function Home() {
             Supabase에서 데이터를 가져오지 못해 샘플 데이터를 표시 중입니다. (schema.sql / seed.sql 적용 여부 확인)
           </p>
         )}
-        <DailyCardSlider>
+        <DailyCardSlider pastCards={pastCards}>
           <SummaryCardView card={card} />
         </DailyCardSlider>
       </main>

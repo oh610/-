@@ -45,6 +45,22 @@ export async function getLatestSummaryCard(): Promise<SummaryCard | null> {
   return buildSummaryCard(card);
 }
 
+export async function getPastSummaryCards(excludeId: string, limit = 10): Promise<SummaryCard[]> {
+  const { data, error } = await supabase
+    .from("summary_cards")
+    .select("*")
+    .neq("id", excludeId)
+    .order("published_date", { ascending: false })
+    .limit(limit);
+
+  if (error) {
+    console.error("[getPastSummaryCards]", error);
+    return [];
+  }
+
+  return Promise.all((data ?? []).map((card) => buildSummaryCard(card)));
+}
+
 export async function getSummaryCardById(id: string): Promise<SummaryCard | null> {
   const { data: card, error } = await supabase
     .from("summary_cards")
