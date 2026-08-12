@@ -56,6 +56,14 @@ export function MainNav() {
           { label: "지난 뉴스", href: "/archive" },
         ]}
       />
+      <NavDropdown
+        label="대통령"
+        items={[
+          { label: "대통령 소개", href: "/president" },
+          { label: "지지율", href: "/president/approval" },
+          { label: "공약 이행현황", href: "/president/pledges" },
+        ]}
+      />
       <Link href="/members" className="shrink-0 text-zinc-300 transition hover:text-violet-400">
         국회의원 활동
       </Link>

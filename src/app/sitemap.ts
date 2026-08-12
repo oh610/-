@@ -4,7 +4,20 @@ import { searchMembers } from "@/lib/supabase/members";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://polispoon.vercel.app";
 
-const STATIC_PATHS = ["/", "/home", "/archive", "/members", "/pricing", "/guide", "/contact", "/terms", "/privacy"];
+const STATIC_PATHS = [
+  "/",
+  "/home",
+  "/archive",
+  "/members",
+  "/president",
+  "/president/approval",
+  "/president/pledges",
+  "/pricing",
+  "/guide",
+  "/contact",
+  "/terms",
+  "/privacy",
+];
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const staticEntries: MetadataRoute.Sitemap = STATIC_PATHS.map((path) => ({
