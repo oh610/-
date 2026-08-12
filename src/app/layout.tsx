@@ -45,6 +45,9 @@ export const metadata: Metadata = {
     title: "정론관 | 진보·보수 양쪽 입장을 한눈에",
     description: SITE_DESCRIPTION,
   },
+  verification: {
+    google: "S3BE9_o0O6-JXh6qVAYCJhfUYVsBgLbRziQkVzPSD_s",
+  },
 };
 
 export const viewport: Viewport = {
