@@ -6,5 +6,6 @@ grant usage on schema public to service_role;
 grant all on
   parties, members, member_party_history, bills, bill_sponsors, votes,
   articles, press_releases, summary_cards, summary_card_citations,
-  summary_card_figures, party_ideology_classifications, ideology_appeals, users
+  summary_card_figures, party_ideology_classifications, ideology_appeals, users,
+  member_mention_counts
 to service_role;

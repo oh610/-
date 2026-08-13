@@ -14,3 +14,4 @@ alter table member_mention_counts enable row level security;
 create policy "public read member_mention_counts" on member_mention_counts for select using (true);
 
 grant select on member_mention_counts to anon, authenticated;
+grant all on member_mention_counts to service_role;
