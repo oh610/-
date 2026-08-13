@@ -3,13 +3,21 @@ import type { TopActiveMember } from "@/lib/supabase/members";
 
 const RANK_COLOR = ["text-violet-500", "text-violet-500", "text-violet-500"];
 
-export function TopActiveMembersPanel({ members }: { members: TopActiveMember[] }) {
+export function TopActiveMembersPanel({
+  members,
+  icon = "🔥",
+  heading = "최근 30일 활동 TOP 10",
+}: {
+  members: TopActiveMember[];
+  icon?: string;
+  heading?: string;
+}) {
   if (members.length === 0) return null;
 
   return (
-    <div className="rounded-2xl border border-zinc-200 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-950 lg:sticky lg:top-20">
+    <div className="rounded-2xl border border-zinc-200 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-950">
       <h2 className="mb-4 flex items-center gap-1.5 text-sm font-semibold text-zinc-900 dark:text-zinc-50">
-        <span aria-hidden>🔥</span> 최근 30일 활동 TOP 10
+        <span aria-hidden>{icon}</span> {heading}
       </h2>
       <ol className="flex flex-col gap-1">
         {members.map((m, i) => (

@@ -95,7 +95,7 @@ export type TopActiveMember = {
   activityCount: number;
 };
 
-export async function getTopActiveMembers(limit = 10, days = 30): Promise<TopActiveMember[]> {
+async function getMemberActivityCounts(days: number): Promise<Map<string, number>> {
   const sinceMs = Date.now() - days * 24 * 60 * 60 * 1000;
 
   const [sponsoredRes, coSponsoredRes, votesRes] = await Promise.all([
@@ -136,26 +136,28 @@ export async function getTopActiveMembers(limit = 10, days = 30): Promise<TopAct
     bump(v.member_id, v.voted_at);
   }
 
-  const topIds = [...countByMember.entries()]
-    .sort((a, b) => b[1] - a[1])
-    .slice(0, limit)
-    .map(([id]) => id);
+  return countByMember;
+}
 
-  if (topIds.length === 0) return [];
+async function resolveActiveMembers(
+  ids: string[],
+  countByMember: Map<string, number>,
+): Promise<TopActiveMember[]> {
+  if (ids.length === 0) return [];
 
   const { data: members, error } = await supabase
     .from("members")
     .select("id, name, photo_url, parties(name, ideology)")
-    .in("id", topIds);
+    .in("id", ids);
 
   if (error) {
-    console.error("[getTopActiveMembers]", error);
+    console.error("[resolveActiveMembers]", error);
     return [];
   }
 
   const memberMap = new Map((members ?? []).map((m) => [m.id, m]));
 
-  return topIds
+  return ids
     .map((id) => {
       const m = memberMap.get(id);
       const count = countByMember.get(id);
@@ -172,6 +174,26 @@ export async function getTopActiveMembers(limit = 10, days = 30): Promise<TopAct
       return result;
     })
     .filter((m): m is TopActiveMember => m !== null);
+}
+
+export async function getTopActiveMembers(limit = 10, days = 30): Promise<TopActiveMember[]> {
+  const countByMember = await getMemberActivityCounts(days);
+  const topIds = [...countByMember.entries()]
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, limit)
+    .map(([id]) => id);
+  return resolveActiveMembers(topIds, countByMember);
+}
+
+// 활동이 0건인 의원은 300명 넘게 동률이라 순위로서 의미가 없어 제외하고,
+// "그나마 활동은 있지만 가장 저조한" 의원을 보여준다.
+export async function getLeastActiveMembers(limit = 5, days = 30): Promise<TopActiveMember[]> {
+  const countByMember = await getMemberActivityCounts(days);
+  const leastIds = [...countByMember.entries()]
+    .sort((a, b) => a[1] - b[1])
+    .slice(0, limit)
+    .map(([id]) => id);
+  return resolveActiveMembers(leastIds, countByMember);
 }
 
 export async function getMemberDetail(id: string): Promise<MemberDetail | null> {
