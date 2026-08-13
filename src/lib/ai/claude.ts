@@ -23,12 +23,17 @@ export async function callClaude(params: {
   system: string;
   user: string;
   maxTokens?: number;
+  effort?: "low" | "medium" | "high";
 }): Promise<string> {
   const res = await getClient().messages.create({
     model: params.model,
-    max_tokens: params.maxTokens ?? 1500,
+    // Claude 5 계열은 기본(high) 적응형 사고(adaptive thinking)를 쓰는데, 사고에 쓰인 토큰도
+    // max_tokens에 포함되어 차감된다. 예산이 너무 작으면 사고만 하다가 최종 JSON 응답이
+    // 중간에 잘려 파싱이 실패할 수 있어 여유 있게 잡는다.
+    max_tokens: params.maxTokens ?? 2048,
     system: params.system,
     messages: [{ role: "user", content: params.user }],
+    ...(params.effort ? { output_config: { effort: params.effort } } : {}),
   });
 
   if (res.stop_reason === "max_tokens") {

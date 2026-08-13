@@ -90,6 +90,8 @@ export async function generateDailySummary(log: (msg: string) => void = console.
     model: MODELS.summarize,
     system: ISSUE_SELECTION_SYSTEM,
     user: issueSelectionUserPrompt(broad.map((a) => a.title)),
+    maxTokens: 4096,
+    effort: "low",
   });
   const issue = parseJsonResponse<IssueSelection>(issueRaw);
   log(`    -> "${issue.issue_title}" (검색어: ${issue.search_query})`);
@@ -122,6 +124,7 @@ export async function generateDailySummary(log: (msg: string) => void = console.
     model: MODELS.extract,
     system: EXTRACTION_SYSTEM,
     user: extractionUserPrompt(combinedContent),
+    maxTokens: 2048,
   });
   const facts = parseJsonResponse<ExtractedFacts>(factsRaw);
 
@@ -136,7 +139,7 @@ export async function generateDailySummary(log: (msg: string) => void = console.
         sourceType: SUPPLEMENTARY_SOURCE_TYPE,
         content: combinedContent,
       }),
-      maxTokens: 2500,
+      maxTokens: 4096,
     }),
     callClaude({
       model: MODELS.summarize,
@@ -147,7 +150,7 @@ export async function generateDailySummary(log: (msg: string) => void = console.
         sourceType: SUPPLEMENTARY_SOURCE_TYPE,
         content: combinedContent,
       }),
-      maxTokens: 2500,
+      maxTokens: 4096,
     }),
   ]);
   const pro = parseJsonResponse<StanceResult>(proRaw);
@@ -161,7 +164,7 @@ export async function generateDailySummary(log: (msg: string) => void = console.
       proSummary: JSON.stringify(pro),
       conSummary: JSON.stringify(con),
     }),
-    maxTokens: 2000,
+    maxTokens: 4096,
   });
   const bias = parseJsonResponse<BiasCheckResult>(biasRaw);
   log(`    -> ${bias.recommendation}${bias.issues.length ? ": " + bias.issues.join(", ") : ""}`);
