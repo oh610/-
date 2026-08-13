@@ -50,19 +50,7 @@ export async function getApprovalRatings(limit = 26): Promise<ApprovalRating[]> 
   }));
 }
 
-export async function getPledgeCategories(): Promise<string[]> {
-  const { data, error } = await supabase.from("pledges").select("category").not("category", "is", null);
-
-  if (error) {
-    console.error("[getPledgeCategories]", error);
-    return [];
-  }
-
-  const categories = new Set((data ?? []).map((p) => p.category as string));
-  return [...categories].sort();
-}
-
-export async function getPledges(query = "", category?: string): Promise<Pledge[]> {
+export async function getPledges(query = ""): Promise<Pledge[]> {
   const [pledgesRes, itemsRes] = await Promise.all([
     supabase
       .from("pledges")
@@ -92,7 +80,6 @@ export async function getPledges(query = "", category?: string): Promise<Pledge[
   const trimmedQuery = query.trim().toLowerCase();
 
   return (pledgesRes.data ?? [])
-    .filter((p) => !category || p.category === category)
     .filter((p) => {
       if (!trimmedQuery) return true;
       const items = itemsByPledge.get(p.id) ?? [];
