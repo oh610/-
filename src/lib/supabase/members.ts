@@ -220,18 +220,20 @@ type MentionRow = {
 // 네이버 API로 조회하면 호출량이 너무 많아지므로, member_mention_counts에 매일 크론이
 // 미리 계산해둔 값을 읽기만 한다. (src/lib/pipeline/sync-member-mentions.ts)
 export async function getHotMembers(limit = 5): Promise<HotMember[]> {
+  // 언급량은 이름으로 네이버 뉴스를 검색해 집계하므로 동명이인은 항상 동일한 건수를 받는다.
+  // top N 안에 같은 이름이 중복으로 뽑히지 않도록 더 넓은 후보군을 가져와 이름 기준으로 걸러낸다.
   const { data, error } = await supabase
     .from("member_mention_counts")
     .select("mention_count, members(id, name, parties(name, ideology))")
     .order("mention_count", { ascending: false })
-    .limit(limit);
+    .limit(Math.max(limit * 4, 20));
 
   if (error) {
     console.error("[getHotMembers]", error);
     return [];
   }
 
-  return ((data ?? []) as unknown as MentionRow[])
+  const candidates = ((data ?? []) as unknown as MentionRow[])
     .map((row) => {
       const m = Array.isArray(row.members) ? row.members[0] : row.members;
       if (!m) return null;
@@ -246,6 +248,16 @@ export async function getHotMembers(limit = 5): Promise<HotMember[]> {
       return result;
     })
     .filter((m): m is HotMember => m !== null);
+
+  const seenNames = new Set<string>();
+  const result: HotMember[] = [];
+  for (const candidate of candidates) {
+    if (seenNames.has(candidate.name)) continue;
+    seenNames.add(candidate.name);
+    result.push(candidate);
+    if (result.length >= limit) break;
+  }
+  return result;
 }
 
 async function getLastActivityDates(): Promise<Map<string, string>> {
