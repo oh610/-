@@ -29,6 +29,19 @@ export async function getPartyList(): Promise<PartyListItem[]> {
     .sort((a, b) => b.memberCount - a.memberCount);
 }
 
+export async function getIndependentMemberCount(): Promise<number> {
+  const { count, error } = await supabase
+    .from("members")
+    .select("id", { count: "exact", head: true })
+    .is("current_party_id", null);
+
+  if (error) {
+    console.error("[getIndependentMemberCount]", error);
+    return 0;
+  }
+  return count ?? 0;
+}
+
 export async function getPartyDetail(id: string): Promise<PartyDetail | null> {
   const [partyRes, membersRes] = await Promise.all([
     supabase.from("parties").select("id, name, ideology, description, homepage_url").eq("id", id).single(),

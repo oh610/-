@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { getPartyDetail } from "@/lib/supabase/parties";
 import { formatDistrictName } from "@/lib/supabase/members";
 import { IdeologyBadge } from "@/components/IdeologyBadge";
+import { getPartyLogo } from "@/lib/party-visuals";
 import { createClient } from "@/lib/supabase/server";
 import { LoginPromptPopup } from "@/components/LoginPromptPopup";
 
@@ -39,6 +40,8 @@ export default async function PartyDetailPage({
   const party = await getPartyDetail(id);
   if (!party) notFound();
 
+  const logo = getPartyLogo(party.name);
+
   const supabase = await createClient();
   const {
     data: { user },
@@ -52,9 +55,17 @@ export default async function PartyDetailPage({
         </Link>
 
         <section className="rounded-2xl border border-zinc-200 bg-white p-6 dark:border-zinc-800 dark:bg-zinc-950">
-          <div className="flex items-center justify-between">
-            <h1 className="text-3xl font-bold text-zinc-950 dark:text-zinc-50">{party.name}</h1>
-            <IdeologyBadge ideology={party.ideology} />
+          <div className="flex items-center gap-3">
+            {logo && (
+              <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-white p-2 ring-1 ring-zinc-200">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={logo} alt={`${party.name} 로고`} className="h-full w-full object-contain" />
+              </div>
+            )}
+            <div className="flex min-w-0 flex-1 items-center justify-between gap-3">
+              <h1 className="truncate text-3xl font-bold text-zinc-950 dark:text-zinc-50">{party.name}</h1>
+              <IdeologyBadge ideology={party.ideology} />
+            </div>
           </div>
           {party.description && (
             <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">{party.description}</p>
