@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { getPledges } from "@/lib/supabase/president";
 import type { Pledge, PledgeStatus } from "@/types/president";
 import { TaegeukWatermark } from "@/components/TaegeukWatermark";
@@ -57,15 +58,20 @@ function PledgeCard({ pledge }: { pledge: Pledge }) {
       {pledge.items.length > 0 && (
         <ul className="mt-3 flex flex-col divide-y divide-zinc-100 border-t border-zinc-100 dark:divide-zinc-900 dark:border-zinc-900">
           {pledge.items.map((item) => (
-            <li key={item.id} className="flex items-center justify-between gap-3 py-2.5">
-              <span className="min-w-0 flex-1 text-sm leading-relaxed text-zinc-600 dark:text-zinc-400">
-                {item.content}
-              </span>
-              <span
-                className={`shrink-0 whitespace-nowrap rounded-full px-2 py-0.5 text-[11px] font-medium ${STATUS_STYLE[item.status]}`}
+            <li key={item.id}>
+              <Link
+                href={`/president/pledges/${item.id}`}
+                className="flex items-center justify-between gap-3 py-2.5 hover:underline"
               >
-                {item.status}
-              </span>
+                <span className="min-w-0 flex-1 text-sm leading-relaxed text-zinc-600 dark:text-zinc-400">
+                  {item.content}
+                </span>
+                <span
+                  className={`shrink-0 whitespace-nowrap rounded-full px-2 py-0.5 text-[11px] font-medium ${STATUS_STYLE[item.status]}`}
+                >
+                  {item.status}
+                </span>
+              </Link>
             </li>
           ))}
         </ul>

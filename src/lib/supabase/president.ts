@@ -1,5 +1,6 @@
 import { supabase } from "@/lib/supabase/client";
-import type { ApprovalRating, Pledge, PledgeStatus, PresidentProfile } from "@/types/president";
+import { searchNews } from "@/lib/collectors/naver-news";
+import type { ApprovalRating, Pledge, PledgeItemDetail, PledgeStatus, PresidentProfile } from "@/types/president";
 
 const STATUS_WEIGHT: Record<PledgeStatus, number> = { "추진 전": 0, "추진 중": 50, "이행 완료": 100 };
 
@@ -78,6 +79,40 @@ export async function getApprovalRatingsPage(
   }));
 
   return { ratings, totalPages: Math.max(1, Math.ceil((count ?? 0) / pageSize)) };
+}
+
+export async function getPledgeItemDetail(id: string): Promise<PledgeItemDetail | null> {
+  const { data, error } = await supabase
+    .from("pledge_items")
+    .select("id, content, status, pledge_id, pledges(title, category)")
+    .eq("id", id)
+    .maybeSingle();
+
+  if (error || !data) {
+    console.error("[getPledgeItemDetail]", error);
+    return null;
+  }
+
+  const pledge = Array.isArray(data.pledges) ? data.pledges[0] : data.pledges;
+  if (!pledge) return null;
+
+  let news: PledgeItemDetail["news"] = [];
+  try {
+    const items = await searchNews(data.content, 8);
+    news = items.map((n) => ({ title: n.title, link: n.link, description: n.description, pubDate: n.pubDate }));
+  } catch (err) {
+    console.error("[getPledgeItemDetail] 뉴스 조회 실패", err);
+  }
+
+  return {
+    id: data.id,
+    content: data.content,
+    status: data.status,
+    pledgeId: data.pledge_id,
+    pledgeTitle: pledge.title,
+    category: pledge.category,
+    news,
+  };
 }
 
 export async function getPledges(query = ""): Promise<Pledge[]> {

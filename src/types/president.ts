@@ -34,3 +34,20 @@ export type Pledge = {
   items: PledgeItem[];
   completionPercent: number | null;
 };
+
+export type PledgeItemNews = {
+  title: string;
+  link: string;
+  description: string;
+  pubDate: string;
+};
+
+export type PledgeItemDetail = {
+  id: string;
+  content: string;
+  status: PledgeStatus;
+  pledgeId: string;
+  pledgeTitle: string;
+  category: string | null;
+  news: PledgeItemNews[];
+};
