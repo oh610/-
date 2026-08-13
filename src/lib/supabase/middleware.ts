@@ -40,6 +40,7 @@ export async function updateSession(request: NextRequest) {
     "/pricing",
     "/guide",
     "/contact",
+    "/api/contact",
     "/robots.txt",
     "/sitemap.xml",
   ];
