@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import Link from "next/link";
+import { Analytics } from "@vercel/analytics/next";
 import { AuthNav } from "@/components/AuthNav";
 import { MainNav } from "@/components/MainNav";
 import { AdBanner } from "@/components/AdBanner";
@@ -125,6 +126,7 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
           </div>
         </footer>
         <BetaNoticePopup />
+        <Analytics />
       </body>
     </html>
   );
