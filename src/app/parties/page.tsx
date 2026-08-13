@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { getPartyList } from "@/lib/supabase/parties";
 import { IdeologyBadge } from "@/components/IdeologyBadge";
+import { InfoTooltip } from "@/components/InfoTooltip";
 import { createClient } from "@/lib/supabase/server";
 import { LoginPromptPopup } from "@/components/LoginPromptPopup";
 
@@ -23,7 +24,13 @@ export default async function PartiesPage() {
   return (
     <div className="min-h-screen bg-zinc-50 px-4 py-16 dark:bg-black">
       <main className="mx-auto flex w-full max-w-2xl flex-col gap-6">
-        <h1 className="text-lg font-medium text-zinc-500 dark:text-zinc-400">정당</h1>
+        <div className="flex items-center justify-between">
+          <h1 className="text-lg font-medium text-zinc-500 dark:text-zinc-400">정당</h1>
+          <InfoTooltip
+            label="정당 이념 성향 분류 기준 설명"
+            text="특정 기관의 공식 판정이 아니라 언론·학계에서 통상적으로 쓰는 분류를 참고한 정론관 자체 기준이에요. 정권 교체와 무관하게 고정 적용하고, 신설 정당은 강령과 소속 의원 이력을 참고해 분류해요."
+          />
+        </div>
 
         <ul className="flex flex-col gap-3">
           {parties.map((p) => (
