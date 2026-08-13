@@ -52,6 +52,7 @@ export function InactiveMembersPanel({
   heading?: string;
 }) {
   const [expanded, setExpanded] = useState(false);
+  const [showInfo, setShowInfo] = useState(false);
 
   if (members.length === 0) return null;
 
@@ -60,9 +61,33 @@ export function InactiveMembersPanel({
 
   return (
     <div className="rounded-2xl border border-zinc-200 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-950">
-      <h2 className="mb-4 flex items-center gap-1.5 text-sm font-semibold text-zinc-900 dark:text-zinc-50">
-        <span aria-hidden>{icon}</span> {heading}
-      </h2>
+      <div className="mb-4 flex items-center justify-between gap-2">
+        <h2 className="flex items-center gap-1.5 text-sm font-semibold text-zinc-900 dark:text-zinc-50">
+          <span aria-hidden>{icon}</span> {heading}
+        </h2>
+        <div
+          className="relative shrink-0"
+          onMouseEnter={() => setShowInfo(true)}
+          onMouseLeave={() => setShowInfo(false)}
+        >
+          <button
+            type="button"
+            aria-label="미활동 기준 설명"
+            aria-expanded={showInfo}
+            onClick={() => setShowInfo((v) => !v)}
+            className="flex h-4 w-4 items-center justify-center rounded-full border border-zinc-300 text-[10px] leading-none text-zinc-400 transition hover:border-zinc-400 hover:text-zinc-600 dark:border-zinc-700 dark:text-zinc-500 dark:hover:border-zinc-500 dark:hover:text-zinc-300"
+          >
+            i
+          </button>
+          {showInfo && (
+            <div className="absolute right-0 top-6 z-20 w-56 rounded-lg border border-zinc-200 bg-white p-2.5 text-[11px] leading-snug text-zinc-600 shadow-lg dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-300">
+              &apos;미활동&apos;은 최근 30일간 대표/공동발의·표결 기록이 0건이라는 뜻이에요. &apos;활동 이력
+              없음&apos;은 저희가 동기화한 데이터 전체 기간을 통틀어도 기록이 없다는 의미로, 실제 의정 활동이
+              전혀 없었다는 보장은 아니에요.
+            </div>
+          )}
+        </div>
+      </div>
       <ol className="flex flex-col gap-1">
         {preview.map((m, i) => (
           <MemberRow key={m.id} m={m} rank={i + 1} />
