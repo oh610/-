@@ -50,7 +50,19 @@ export async function getApprovalRatings(limit = 26): Promise<ApprovalRating[]> 
   }));
 }
 
-export async function getPledges(): Promise<Pledge[]> {
+export async function getPledgeCategories(): Promise<string[]> {
+  const { data, error } = await supabase.from("pledges").select("category").not("category", "is", null);
+
+  if (error) {
+    console.error("[getPledgeCategories]", error);
+    return [];
+  }
+
+  const categories = new Set((data ?? []).map((p) => p.category as string));
+  return [...categories].sort();
+}
+
+export async function getPledges(query = "", category?: string): Promise<Pledge[]> {
   const [pledgesRes, itemsRes] = await Promise.all([
     supabase
       .from("pledges")
@@ -77,21 +89,33 @@ export async function getPledges(): Promise<Pledge[]> {
     itemsByPledge.set(item.pledge_id, list);
   }
 
-  return (pledgesRes.data ?? []).map((p) => {
-    const items = itemsByPledge.get(p.id) ?? [];
-    const completionPercent =
-      items.length === 0
-        ? null
-        : Math.round(items.reduce((sum, i) => sum + STATUS_WEIGHT[i.status], 0) / items.length);
+  const trimmedQuery = query.trim().toLowerCase();
 
-    return {
-      id: p.id,
-      title: p.title,
-      category: p.category,
-      sourceUrl: p.source_url,
-      displayOrder: p.display_order,
-      items,
-      completionPercent,
-    };
-  });
+  return (pledgesRes.data ?? [])
+    .filter((p) => !category || p.category === category)
+    .filter((p) => {
+      if (!trimmedQuery) return true;
+      const items = itemsByPledge.get(p.id) ?? [];
+      return (
+        p.title.toLowerCase().includes(trimmedQuery) ||
+        items.some((i) => i.content.toLowerCase().includes(trimmedQuery))
+      );
+    })
+    .map((p) => {
+      const items = itemsByPledge.get(p.id) ?? [];
+      const completionPercent =
+        items.length === 0
+          ? null
+          : Math.round(items.reduce((sum, i) => sum + STATUS_WEIGHT[i.status], 0) / items.length);
+
+      return {
+        id: p.id,
+        title: p.title,
+        category: p.category,
+        sourceUrl: p.source_url,
+        displayOrder: p.display_order,
+        items,
+        completionPercent,
+      };
+    });
 }

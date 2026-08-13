@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
-import { getPledges } from "@/lib/supabase/president";
+import { getPledges, getPledgeCategories } from "@/lib/supabase/president";
 import type { PledgeStatus } from "@/types/president";
 import { TaegeukWatermark } from "@/components/TaegeukWatermark";
+import { PledgeCategoryFilter } from "@/components/PledgeCategoryFilter";
 
 export const dynamic = "force-dynamic";
 
@@ -22,8 +23,13 @@ function percentStyle(percent: number): string {
   return "bg-zinc-200 text-zinc-700 dark:bg-zinc-700 dark:text-zinc-200";
 }
 
-export default async function PresidentPledgesPage() {
-  const pledges = await getPledges();
+export default async function PresidentPledgesPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ q?: string; category?: string }>;
+}) {
+  const { q = "", category } = await searchParams;
+  const [pledges, categories] = await Promise.all([getPledges(q, category), getPledgeCategories()]);
 
   return (
     <div className="relative min-h-screen overflow-hidden bg-zinc-50 px-4 py-16 dark:bg-black">
@@ -31,8 +37,27 @@ export default async function PresidentPledgesPage() {
       <main className="relative mx-auto flex w-full max-w-2xl flex-col gap-6">
         <h1 className="text-lg font-medium text-zinc-500 dark:text-zinc-400">공약 이행현황</h1>
 
+        <div className="flex flex-col gap-2 sm:flex-row">
+          <form className="flex flex-1 gap-2">
+            <input
+              type="text"
+              name="q"
+              defaultValue={q}
+              placeholder="공약 검색"
+              className="w-full rounded-lg border border-zinc-300 bg-white px-4 py-2 text-sm text-zinc-900 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
+            />
+            {category && <input type="hidden" name="category" value={category} />}
+            <button type="submit" className="btn-primary shrink-0">
+              검색
+            </button>
+          </form>
+          <div className="sm:w-40">
+            <PledgeCategoryFilter categories={categories} />
+          </div>
+        </div>
+
         {pledges.length === 0 ? (
-          <p className="text-sm text-zinc-500 dark:text-zinc-400">아직 등록된 공약이 없습니다.</p>
+          <p className="text-sm text-zinc-500 dark:text-zinc-400">조건에 맞는 공약이 없습니다.</p>
         ) : (
           <ul className="flex flex-col gap-3">
             {pledges.map((p) => (
