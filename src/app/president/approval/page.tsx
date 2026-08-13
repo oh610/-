@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
-import { getApprovalRatings } from "@/lib/supabase/president";
+import Link from "next/link";
+import { getApprovalRatings, getApprovalRatingsPage } from "@/lib/supabase/president";
 import { ApprovalRatingChart } from "@/components/ApprovalRatingChart";
 import { TaegeukWatermark } from "@/components/TaegeukWatermark";
 
@@ -10,9 +11,19 @@ export const metadata: Metadata = {
   description: "매주 발표되는 대통령 지지율 변동 추이를 확인해 보세요.",
 };
 
-export default async function PresidentApprovalPage() {
-  const ratings = await getApprovalRatings(26);
-  const latest = ratings[0] ?? null;
+export default async function PresidentApprovalPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ page?: string }>;
+}) {
+  const { page: pageParam } = await searchParams;
+  const page = Math.max(1, Number(pageParam) || 1);
+
+  const [chartRatings, { ratings: listRatings, totalPages }] = await Promise.all([
+    getApprovalRatings(26),
+    getApprovalRatingsPage(page, 26),
+  ]);
+  const latest = chartRatings[0] ?? null;
 
   return (
     <div className="relative min-h-screen overflow-hidden bg-zinc-50 px-4 py-16 dark:bg-black">
@@ -44,12 +55,12 @@ export default async function PresidentApprovalPage() {
 
             <section className="rounded-2xl border border-zinc-200 bg-white p-6 dark:border-zinc-800 dark:bg-zinc-950">
               <h2 className="mb-4 text-sm font-semibold text-zinc-500 dark:text-zinc-400">최근 추이</h2>
-              <ApprovalRatingChart ratings={ratings} />
+              <ApprovalRatingChart ratings={chartRatings} />
             </section>
 
             <section className="rounded-2xl border border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-950">
               <ul className="divide-y divide-zinc-200 dark:divide-zinc-800">
-                {ratings.map((r) => (
+                {listRatings.map((r) => (
                   <li key={r.id} className="flex items-center justify-between gap-3 px-5 py-3 text-sm">
                     <div className="min-w-0">
                       <p className="text-zinc-900 dark:text-zinc-50">{r.surveyDate}</p>
@@ -75,6 +86,24 @@ export default async function PresidentApprovalPage() {
                 ))}
               </ul>
             </section>
+
+            {totalPages > 1 && (
+              <nav className="flex items-center justify-center gap-1.5">
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
+                  <Link
+                    key={p}
+                    href={p === 1 ? "/president/approval" : `/president/approval?page=${p}`}
+                    className={
+                      p === page
+                        ? "flex h-8 w-8 items-center justify-center rounded-lg bg-violet-500 text-sm font-semibold text-white"
+                        : "flex h-8 w-8 items-center justify-center rounded-lg text-sm text-zinc-600 hover:bg-zinc-100 dark:text-zinc-400 dark:hover:bg-zinc-900"
+                    }
+                  >
+                    {p}
+                  </Link>
+                ))}
+              </nav>
+            )}
           </>
         )}
       </main>

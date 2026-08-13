@@ -50,6 +50,36 @@ export async function getApprovalRatings(limit = 26): Promise<ApprovalRating[]> 
   }));
 }
 
+export async function getApprovalRatingsPage(
+  page = 1,
+  pageSize = 26,
+): Promise<{ ratings: ApprovalRating[]; totalPages: number }> {
+  const from = (page - 1) * pageSize;
+  const to = from + pageSize - 1;
+
+  const { data, error, count } = await supabase
+    .from("approval_ratings")
+    .select("id, survey_date, agency, approval_percent, disapproval_percent, source_url", { count: "exact" })
+    .order("survey_date", { ascending: false })
+    .range(from, to);
+
+  if (error) {
+    console.error("[getApprovalRatingsPage]", error);
+    return { ratings: [], totalPages: 1 };
+  }
+
+  const ratings = (data ?? []).map((r) => ({
+    id: r.id,
+    surveyDate: r.survey_date,
+    agency: r.agency,
+    approvalPercent: Number(r.approval_percent),
+    disapprovalPercent: r.disapproval_percent === null ? null : Number(r.disapproval_percent),
+    sourceUrl: r.source_url,
+  }));
+
+  return { ratings, totalPages: Math.max(1, Math.ceil((count ?? 0) / pageSize)) };
+}
+
 export async function getPledges(query = ""): Promise<Pledge[]> {
   const [pledgesRes, itemsRes] = await Promise.all([
     supabase
