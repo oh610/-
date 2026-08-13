@@ -24,12 +24,22 @@ export default async function PresidentApprovalPage() {
           <p className="text-sm text-zinc-500 dark:text-zinc-400">아직 등록된 지지율 조사가 없습니다.</p>
         ) : (
           <>
-            <section className="rounded-2xl border border-zinc-200 bg-white p-6 text-center dark:border-zinc-800 dark:bg-zinc-950">
-              <p className="text-xs text-zinc-500 dark:text-zinc-400">
+            <section className="rounded-2xl border border-zinc-200 bg-white p-6 dark:border-zinc-800 dark:bg-zinc-950">
+              <p className="text-center text-xs text-zinc-500 dark:text-zinc-400">
                 {latest.surveyDate} · {latest.agency} 조사
               </p>
-              <p className="mt-2 text-5xl font-bold text-violet-500">{latest.approvalPercent}%</p>
-              <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">긍정 평가</p>
+              <div className="mt-2 grid grid-cols-2 divide-x divide-zinc-100 dark:divide-zinc-900">
+                <div className="text-center">
+                  <p className="text-5xl font-bold text-violet-500">{latest.approvalPercent}%</p>
+                  <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">긍정 평가</p>
+                </div>
+                <div className="text-center">
+                  <p className="text-5xl font-bold text-rose-500">
+                    {latest.disapprovalPercent != null ? `${latest.disapprovalPercent}%` : "—"}
+                  </p>
+                  <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">부정 평가</p>
+                </div>
+              </div>
             </section>
 
             <section className="rounded-2xl border border-zinc-200 bg-white p-6 dark:border-zinc-800 dark:bg-zinc-950">
@@ -46,7 +56,10 @@ export default async function PresidentApprovalPage() {
                       <p className="text-xs text-zinc-500 dark:text-zinc-400">{r.agency}</p>
                     </div>
                     <div className="flex shrink-0 items-center gap-3">
-                      <span className="font-semibold text-violet-500">{r.approvalPercent}%</span>
+                      <span className="font-semibold text-violet-500">긍정 {r.approvalPercent}%</span>
+                      {r.disapprovalPercent != null && (
+                        <span className="font-semibold text-rose-500">부정 {r.disapprovalPercent}%</span>
+                      )}
                       {r.sourceUrl && (
                         <a
                           href={r.sourceUrl}

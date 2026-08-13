@@ -48,6 +48,7 @@ export async function updateSession(request: NextRequest) {
     isAuthPage ||
     publicOnlyPaths.includes(path) ||
     path.startsWith("/members") ||
+    path.startsWith("/parties") ||
     path.startsWith("/archive") ||
     path.startsWith("/president") ||
     path.startsWith("/auth/") ||

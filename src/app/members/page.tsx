@@ -19,6 +19,7 @@ import { InactiveMembersPanel } from "@/components/InactiveMembersPanel";
 import { HotMembersTicker } from "@/components/HotMembersTicker";
 import { BillRankPanel } from "@/components/BillRankPanel";
 import { MembersSwipeContainer } from "@/components/MembersSwipeContainer";
+import { IdeologyBadge } from "@/components/IdeologyBadge";
 
 export const dynamic = "force-dynamic";
 
@@ -26,20 +27,6 @@ export const metadata: Metadata = {
   title: "국회의원",
   description: "국회의원 프로필, 발의 법안, 표결 이력을 검색해 보세요.",
 };
-
-function IdeologyBadge({ ideology }: { ideology: "진보" | "보수" }) {
-  return (
-    <span
-      className={
-        ideology === "진보"
-          ? "rounded-full bg-blue-100 px-2 py-0.5 text-xs text-blue-700 dark:bg-blue-900/40 dark:text-blue-400"
-          : "rounded-full bg-rose-100 px-2 py-0.5 text-xs text-rose-700 dark:bg-rose-900/40 dark:text-rose-400"
-      }
-    >
-      {ideology}
-    </span>
-  );
-}
 
 export default async function MembersPage({
   searchParams,

@@ -67,6 +67,9 @@ export function MainNav() {
       <Link href="/members" className="shrink-0 text-zinc-300 transition hover:text-violet-400">
         국회의원
       </Link>
+      <Link href="/parties" className="shrink-0 text-zinc-300 transition hover:text-violet-400">
+        정당
+      </Link>
       <Link href="/pricing" className="shrink-0 text-zinc-300 transition hover:text-violet-400">
         구독
       </Link>
