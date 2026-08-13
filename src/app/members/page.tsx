@@ -5,6 +5,7 @@ import {
   getDistrictOptions,
   getTopActiveMembers,
   getLeastActiveMembers,
+  getInactiveMembers,
   formatDistrictName,
 } from "@/lib/supabase/members";
 import { getRecentBills, getHotBills } from "@/lib/supabase/bills";
@@ -12,6 +13,7 @@ import { createClient } from "@/lib/supabase/server";
 import { LoginPromptPopup } from "@/components/LoginPromptPopup";
 import { DistrictFilter } from "@/components/DistrictFilter";
 import { TopActiveMembersPanel } from "@/components/TopActiveMembersPanel";
+import { InactiveMembersPanel } from "@/components/InactiveMembersPanel";
 import { BillRankPanel } from "@/components/BillRankPanel";
 
 export const dynamic = "force-dynamic";
@@ -41,14 +43,16 @@ export default async function MembersPage({
   searchParams: Promise<{ q?: string; region?: string; district?: string }>;
 }) {
   const { q = "", region, district } = await searchParams;
-  const [members, districtOptions, topActiveMembers, leastActiveMembers, recentBills, hotBills] = await Promise.all([
-    searchMembers(q, region, district),
-    getDistrictOptions(),
-    getTopActiveMembers(10, 30),
-    getLeastActiveMembers(5, 30),
-    getRecentBills(5),
-    getHotBills(5, 15),
-  ]);
+  const [members, districtOptions, topActiveMembers, leastActiveMembers, inactiveMembers, recentBills, hotBills] =
+    await Promise.all([
+      searchMembers(q, region, district),
+      getDistrictOptions(),
+      getTopActiveMembers(10, 30),
+      getLeastActiveMembers(5, 30),
+      getInactiveMembers(5, 30),
+      getRecentBills(5),
+      getHotBills(5, 15),
+    ]);
 
   const supabase = await createClient();
   const {
@@ -109,6 +113,7 @@ export default async function MembersPage({
             icon="🐢"
             heading="최근 30일 활동 저조 TOP 5"
           />
+          <InactiveMembersPanel members={inactiveMembers.members} totalCount={inactiveMembers.totalCount} />
         </aside>
 
         <ul className="members-results flex w-full min-w-0 max-w-2xl flex-col gap-3">

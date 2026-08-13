@@ -196,6 +196,99 @@ export async function getLeastActiveMembers(limit = 5, days = 30): Promise<TopAc
   return resolveActiveMembers(leastIds, countByMember);
 }
 
+async function getLastActivityDates(): Promise<Map<string, string>> {
+  const [sponsoredRes, coSponsoredRes, votesRes] = await Promise.all([
+    supabase
+      .from("bills")
+      .select("main_sponsor_id, proposed_date")
+      .not("main_sponsor_id", "is", null)
+      .order("proposed_date", { ascending: false })
+      .limit(2000),
+    supabase
+      .from("bill_sponsors")
+      .select("member_id, bills(proposed_date)")
+      .order("proposed_date", { foreignTable: "bills", ascending: false })
+      .limit(2000),
+    supabase.from("votes").select("member_id, voted_at").order("voted_at", { ascending: false }).limit(2000),
+  ]);
+
+  const lastByMember = new Map<string, string>();
+
+  function consider(memberId: string | null | undefined, date: string | null | undefined) {
+    if (!memberId || !date) return;
+    const existing = lastByMember.get(memberId);
+    if (!existing || new Date(date).getTime() > new Date(existing).getTime()) {
+      lastByMember.set(memberId, date);
+    }
+  }
+
+  for (const b of sponsoredRes.data ?? []) {
+    consider(b.main_sponsor_id, b.proposed_date);
+  }
+  for (const row of coSponsoredRes.data ?? []) {
+    const bill = Array.isArray(row.bills) ? row.bills[0] : row.bills;
+    consider(row.member_id, bill?.proposed_date ?? null);
+  }
+  for (const v of votesRes.data ?? []) {
+    consider(v.member_id, v.voted_at);
+  }
+
+  return lastByMember;
+}
+
+export type InactiveMember = {
+  id: string;
+  name: string;
+  partyName: string | null;
+  ideology: "진보" | "보수" | null;
+  photoUrl: string | null;
+  inactiveDays: number | null; // null = 활동 이력이 아예 없음
+};
+
+// 최근 N일간 활동이 0건인 의원 중, 동률(0건)이 많으므로 "역대 마지막 활동일이 가장
+// 오래된"(=미활동 기간이 가장 긴) 순으로 상위 limit명을 뽑고 나머지는 개수만 센다.
+export async function getInactiveMembers(
+  limit = 5,
+  days = 30,
+): Promise<{ members: InactiveMember[]; totalCount: number }> {
+  const [countByMember, lastActivityByMember, allMembersRes] = await Promise.all([
+    getMemberActivityCounts(days),
+    getLastActivityDates(),
+    supabase.from("members").select("id, name, photo_url, parties(name, ideology)"),
+  ]);
+
+  if (allMembersRes.error) {
+    console.error("[getInactiveMembers]", allMembersRes.error);
+    return { members: [], totalCount: 0 };
+  }
+
+  const inactive = (allMembersRes.data ?? [])
+    .filter((m) => !countByMember.has(m.id))
+    .map((m) => {
+      const last = lastActivityByMember.get(m.id);
+      const inactiveDays = last ? Math.floor((Date.now() - new Date(last).getTime()) / (24 * 60 * 60 * 1000)) : null;
+      const party = toParty(m.parties as PartyRef);
+      const result: InactiveMember = {
+        id: m.id,
+        name: m.name,
+        partyName: party?.name ?? null,
+        ideology: party?.ideology ?? null,
+        photoUrl: m.photo_url,
+        inactiveDays,
+      };
+      return result;
+    });
+
+  inactive.sort((a, b) => {
+    if (a.inactiveDays === null && b.inactiveDays === null) return 0;
+    if (a.inactiveDays === null) return -1; // 활동 이력이 아예 없으면 가장 오래된 것으로 취급
+    if (b.inactiveDays === null) return 1;
+    return b.inactiveDays - a.inactiveDays;
+  });
+
+  return { members: inactive.slice(0, limit), totalCount: inactive.length };
+}
+
 export async function getMemberDetail(id: string): Promise<MemberDetail | null> {
   const { data: member, error } = await supabase
     .from("members")
