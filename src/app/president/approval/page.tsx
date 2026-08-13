@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { getApprovalRatings } from "@/lib/supabase/president";
 import { ApprovalRatingChart } from "@/components/ApprovalRatingChart";
+import { TaegeukWatermark } from "@/components/TaegeukWatermark";
 
 export const dynamic = "force-dynamic";
 
@@ -14,8 +15,9 @@ export default async function PresidentApprovalPage() {
   const latest = ratings[0] ?? null;
 
   return (
-    <div className="min-h-screen bg-zinc-50 px-4 py-16 dark:bg-black">
-      <main className="mx-auto flex w-full max-w-2xl flex-col gap-6">
+    <div className="relative min-h-screen overflow-hidden bg-zinc-50 px-4 py-16 dark:bg-black">
+      <TaegeukWatermark />
+      <main className="relative mx-auto flex w-full max-w-2xl flex-col gap-6">
         <h1 className="text-lg font-medium text-zinc-500 dark:text-zinc-400">대통령 지지율</h1>
 
         {!latest ? (

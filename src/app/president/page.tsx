@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { getPresidentProfile } from "@/lib/supabase/president";
+import { TaegeukWatermark } from "@/components/TaegeukWatermark";
 
 export const dynamic = "force-dynamic";
 
@@ -18,8 +19,9 @@ export default async function PresidentPage() {
     .filter(Boolean);
 
   return (
-    <div className="min-h-screen bg-zinc-50 px-4 py-16 dark:bg-black">
-      <main className="mx-auto flex w-full max-w-4xl flex-col gap-8">
+    <div className="relative min-h-screen overflow-hidden bg-zinc-50 px-4 py-16 dark:bg-black">
+      <TaegeukWatermark />
+      <main className="relative mx-auto flex w-full max-w-4xl flex-col gap-8">
         <h1 className="text-lg font-medium text-zinc-500 dark:text-zinc-400">대통령 소개</h1>
 
         {!profile || !profile.name ? (
@@ -27,7 +29,7 @@ export default async function PresidentPage() {
         ) : (
           <section className="rounded-3xl border border-zinc-200 bg-white shadow-sm dark:border-zinc-800 dark:bg-zinc-950">
             <div className="flex flex-col md:flex-row">
-              <div className="aspect-[4/5] w-full shrink-0 self-start overflow-hidden rounded-t-3xl bg-zinc-100 md:sticky md:top-20 md:w-72 md:rounded-t-none md:rounded-l-3xl lg:w-80 dark:bg-zinc-900">
+              <div className="aspect-[4/5] w-full shrink-0 self-start overflow-hidden rounded-t-3xl bg-zinc-100 md:w-72 md:rounded-t-none md:rounded-l-3xl lg:w-80 dark:bg-zinc-900">
                 {profile.photoUrl ? (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img
@@ -55,7 +57,7 @@ export default async function PresidentPage() {
                 </div>
 
                 {bioLines && bioLines.length > 0 && (
-                  <ul className="flex flex-col gap-2.5 border-t border-zinc-100 pt-5 dark:border-zinc-900">
+                  <ul className="flex flex-col gap-2.5 overflow-y-auto border-t border-zinc-100 pt-5 pr-1 md:max-h-96 dark:border-zinc-900">
                     {bioLines.map((line, i) => (
                       <li key={i} className="flex gap-2.5 text-[15px] leading-relaxed text-zinc-700 dark:text-zinc-300">
                         <span aria-hidden className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-violet-400" />
