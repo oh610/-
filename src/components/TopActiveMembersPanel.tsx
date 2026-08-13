@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { TopActiveMember } from "@/lib/supabase/members";
+import { InfoTooltip } from "@/components/InfoTooltip";
 
 const RANK_COLOR = ["text-violet-500", "text-violet-500", "text-violet-500"];
 
@@ -7,18 +8,23 @@ export function TopActiveMembersPanel({
   members,
   icon = "🔥",
   heading = "최근 30일 활동 TOP 10",
+  infoText = "최근 30일간 대표발의·공동발의·표결 건수를 합산해 많은 순으로 보여줘요. 순위는 페이지를 열 때마다 실시간으로 계산되지만, 바탕이 되는 법안·표결 원본 데이터는 매일 자동 동기화된 시점 기준이에요.",
 }: {
   members: TopActiveMember[];
   icon?: string;
   heading?: string;
+  infoText?: string;
 }) {
   if (members.length === 0) return null;
 
   return (
     <div className="rounded-2xl border border-zinc-200 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-950">
-      <h2 className="mb-4 flex items-center gap-1.5 text-sm font-semibold text-zinc-900 dark:text-zinc-50">
-        <span aria-hidden>{icon}</span> {heading}
-      </h2>
+      <div className="mb-4 flex items-center justify-between gap-2">
+        <h2 className="flex items-center gap-1.5 text-sm font-semibold text-zinc-900 dark:text-zinc-50">
+          <span aria-hidden>{icon}</span> {heading}
+        </h2>
+        <InfoTooltip label={`${heading} 기준 설명`} text={infoText} />
+      </div>
       <ol className="flex flex-col gap-1">
         {members.map((m, i) => (
           <li key={m.id}>

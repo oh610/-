@@ -70,6 +70,7 @@ export default async function MembersPage({
               assemblyBillId: b.assemblyBillId,
               sub: `${b.proposedDate} · ${b.sponsorName ?? "대표발의자 미상"}`,
             }))}
+            infoText="국회 오픈API에서 동기화한 법안 중 발의일(제안일) 기준 최신 5건이에요. 매일 자동으로 갱신되지만, 국회 시스템 등록 시점에 따라 실제 발의일보다 반영이 하루 정도 늦어질 수 있어요."
           />
           <BillRankPanel
             icon="📰"
@@ -80,6 +81,7 @@ export default async function MembersPage({
               assemblyBillId: b.assemblyBillId,
               sub: `언론 언급 ${b.mentionCount.toLocaleString()}건`,
             }))}
+            infoText="최근 발의 법안 중 네이버 뉴스 언급 건수가 많은 순으로 5건을 보여줘요. 언급 건수는 페이지를 열 때마다 실시간으로 조회돼요."
           />
         </aside>
 

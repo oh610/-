@@ -1,3 +1,5 @@
+import { InfoTooltip } from "@/components/InfoTooltip";
+
 type BillRankItem = {
   id: string;
   title: string;
@@ -9,18 +11,23 @@ export function BillRankPanel({
   icon,
   heading,
   items,
+  infoText,
 }: {
   icon: string;
   heading: string;
   items: BillRankItem[];
+  infoText?: string;
 }) {
   if (items.length === 0) return null;
 
   return (
     <div className="rounded-2xl border border-zinc-200 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-950">
-      <h2 className="mb-4 flex items-center gap-1.5 text-sm font-semibold text-zinc-900 dark:text-zinc-50">
-        <span aria-hidden>{icon}</span> {heading}
-      </h2>
+      <div className="mb-4 flex items-center justify-between gap-2">
+        <h2 className="flex items-center gap-1.5 text-sm font-semibold text-zinc-900 dark:text-zinc-50">
+          <span aria-hidden>{icon}</span> {heading}
+        </h2>
+        {infoText && <InfoTooltip label={`${heading} 기준 설명`} text={infoText} />}
+      </div>
       <ol className="flex flex-col gap-1">
         {items.map((b, i) => {
           const inner = (
