@@ -28,10 +28,32 @@ export function MembersSwipeContainer({ children }: { children: ReactNode }) {
   }
 
   return (
-    <div>
+    <div className="relative">
       <div ref={ref} onScroll={handleScroll} className="members-layout mx-auto w-full max-w-7xl">
         {children}
       </div>
+
+      {active > 0 && (
+        <button
+          type="button"
+          aria-label="이전 화면"
+          onClick={() => scrollToIndex(active - 1)}
+          className="absolute left-1 top-9 z-10 flex h-8 w-8 items-center justify-center rounded-full border border-zinc-200 bg-white/95 text-zinc-500 shadow-sm transition hover:text-zinc-900 lg:hidden dark:border-zinc-800 dark:bg-zinc-950/95 dark:text-zinc-400 dark:hover:text-zinc-50"
+        >
+          ‹
+        </button>
+      )}
+      {active < LABELS.length - 1 && (
+        <button
+          type="button"
+          aria-label="다음 화면"
+          onClick={() => scrollToIndex(active + 1)}
+          className="absolute right-1 top-9 z-10 flex h-8 w-8 items-center justify-center rounded-full border border-zinc-200 bg-white/95 text-zinc-500 shadow-sm transition hover:text-zinc-900 lg:hidden dark:border-zinc-800 dark:bg-zinc-950/95 dark:text-zinc-400 dark:hover:text-zinc-50"
+        >
+          ›
+        </button>
+      )}
+
       <div className="mt-3 flex justify-center gap-4 lg:hidden">
         {LABELS.map((label, i) => (
           <button
