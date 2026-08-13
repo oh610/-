@@ -4,7 +4,6 @@ import {
   searchMembers,
   getDistrictOptions,
   getTopActiveMembers,
-  getLeastActiveMembers,
   getInactiveMembers,
   formatDistrictName,
 } from "@/lib/supabase/members";
@@ -43,16 +42,14 @@ export default async function MembersPage({
   searchParams: Promise<{ q?: string; region?: string; district?: string }>;
 }) {
   const { q = "", region, district } = await searchParams;
-  const [members, districtOptions, topActiveMembers, leastActiveMembers, inactiveMembers, recentBills, hotBills] =
-    await Promise.all([
-      searchMembers(q, region, district),
-      getDistrictOptions(),
-      getTopActiveMembers(10, 30),
-      getLeastActiveMembers(5, 30),
-      getInactiveMembers(5, 30),
-      getRecentBills(5),
-      getHotBills(5, 15),
-    ]);
+  const [members, districtOptions, topActiveMembers, inactiveMembers, recentBills, hotBills] = await Promise.all([
+    searchMembers(q, region, district),
+    getDistrictOptions(),
+    getTopActiveMembers(10, 30),
+    getInactiveMembers(30),
+    getRecentBills(5),
+    getHotBills(5, 15),
+  ]);
 
   const supabase = await createClient();
   const {
@@ -108,12 +105,7 @@ export default async function MembersPage({
 
         <aside className="members-top10 flex w-full shrink-0 flex-col gap-6">
           <TopActiveMembersPanel members={topActiveMembers} />
-          <TopActiveMembersPanel
-            members={leastActiveMembers}
-            icon="🐢"
-            heading="최근 30일 활동 저조 TOP 5"
-          />
-          <InactiveMembersPanel members={inactiveMembers.members} totalCount={inactiveMembers.totalCount} />
+          <InactiveMembersPanel members={inactiveMembers} />
         </aside>
 
         <ul className="members-results flex w-full min-w-0 max-w-2xl flex-col gap-3">

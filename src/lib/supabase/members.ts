@@ -185,17 +185,6 @@ export async function getTopActiveMembers(limit = 10, days = 30): Promise<TopAct
   return resolveActiveMembers(topIds, countByMember);
 }
 
-// 활동이 0건인 의원은 300명 넘게 동률이라 순위로서 의미가 없어 제외하고,
-// "그나마 활동은 있지만 가장 저조한" 의원을 보여준다.
-export async function getLeastActiveMembers(limit = 5, days = 30): Promise<TopActiveMember[]> {
-  const countByMember = await getMemberActivityCounts(days);
-  const leastIds = [...countByMember.entries()]
-    .sort((a, b) => a[1] - b[1])
-    .slice(0, limit)
-    .map(([id]) => id);
-  return resolveActiveMembers(leastIds, countByMember);
-}
-
 async function getLastActivityDates(): Promise<Map<string, string>> {
   const [sponsoredRes, coSponsoredRes, votesRes] = await Promise.all([
     supabase
@@ -245,12 +234,9 @@ export type InactiveMember = {
   inactiveDays: number | null; // null = 활동 이력이 아예 없음
 };
 
-// 최근 N일간 활동이 0건인 의원 중, 동률(0건)이 많으므로 "역대 마지막 활동일이 가장
-// 오래된"(=미활동 기간이 가장 긴) 순으로 상위 limit명을 뽑고 나머지는 개수만 센다.
-export async function getInactiveMembers(
-  limit = 5,
-  days = 30,
-): Promise<{ members: InactiveMember[]; totalCount: number }> {
+// 최근 N일간 활동이 0건인 의원 목록을 "역대 마지막 활동일이 가장 오래된"(=미활동
+// 기간이 가장 긴) 순으로 정렬해 전부 반환한다. 상위 몇 명만 보여줄지는 화면(UI)에서 결정.
+export async function getInactiveMembers(days = 30): Promise<InactiveMember[]> {
   const [countByMember, lastActivityByMember, allMembersRes] = await Promise.all([
     getMemberActivityCounts(days),
     getLastActivityDates(),
@@ -259,7 +245,7 @@ export async function getInactiveMembers(
 
   if (allMembersRes.error) {
     console.error("[getInactiveMembers]", allMembersRes.error);
-    return { members: [], totalCount: 0 };
+    return [];
   }
 
   const inactive = (allMembersRes.data ?? [])
@@ -286,7 +272,7 @@ export async function getInactiveMembers(
     return b.inactiveDays - a.inactiveDays;
   });
 
-  return { members: inactive.slice(0, limit), totalCount: inactive.length };
+  return inactive;
 }
 
 export async function getMemberDetail(id: string): Promise<MemberDetail | null> {
