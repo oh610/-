@@ -1,4 +1,5 @@
 import { supabase } from "@/lib/supabase/client";
+import { getNewsMentionCount } from "@/lib/collectors/naver-news";
 import type { MemberBill, MemberDetail, MemberListItem, MemberVote } from "@/types/member";
 
 type PartyRef = { name: string; ideology: "진보" | "보수" } | { name: string; ideology: "진보" | "보수" }[] | null;
@@ -47,14 +48,29 @@ export async function getDistrictOptions(): Promise<DistrictOption[]> {
   return options;
 }
 
+export async function getPartyOptions(): Promise<string[]> {
+  const { data, error } = await supabase.from("parties").select("name").eq("is_active", true).order("name");
+
+  if (error) {
+    console.error("[getPartyOptions]", error);
+    return [];
+  }
+  return (data ?? []).map((p) => p.name);
+}
+
 export async function searchMembers(
   query: string,
   region?: string,
   district?: string,
+  party?: string,
 ): Promise<MemberListItem[]> {
+  // parties.name으로 필터링하려면 PostgREST에서 embedded resource를 inner join으로
+  // 바꿔야 top-level 행이 실제로 걸러진다. party 필터가 없을 때는 무소속 의원(parties가
+  // null)도 계속 나와야 하므로 그때만 일반 left embed를 쓴다.
+  const partySelect = party ? "parties!inner(name, ideology)" : "parties(name, ideology)";
   let request = supabase
     .from("members")
-    .select("id, name, district_type, district_name, photo_url, parties(name, ideology)")
+    .select(`id, name, district_type, district_name, photo_url, ${partySelect}`)
     .order("name");
 
   if (query.trim()) {
@@ -64,6 +80,9 @@ export async function searchMembers(
     request = request.eq("district_name", district);
   } else if (region) {
     request = request.ilike("district_name", `${region} %`);
+  }
+  if (party) {
+    request = request.eq("parties.name", party);
   }
 
   const { data, error } = await request;
@@ -183,6 +202,29 @@ export async function getTopActiveMembers(limit = 10, days = 30): Promise<TopAct
     .slice(0, limit)
     .map(([id]) => id);
   return resolveActiveMembers(topIds, countByMember);
+}
+
+export type HotMember = TopActiveMember & { mentionCount: number };
+
+// 최근 30일 활동이 있는 의원 중에서 언론 언급량이 많은 순으로 뽑는다. 네이버 검색 API를
+// 후보 인원 수만큼 호출하므로 poolSize를 과도하게 키우지 않는다.
+export async function getHotMembers(limit = 5, poolSize = 15): Promise<HotMember[]> {
+  const candidates = await getTopActiveMembers(poolSize, 30);
+  if (candidates.length === 0) return [];
+
+  const counts = await Promise.all(
+    candidates.map((m) =>
+      getNewsMentionCount(`${m.name} 의원`).catch((err) => {
+        console.error("[getHotMembers] 언급량 조회 실패", m.name, err);
+        return 0;
+      }),
+    ),
+  );
+
+  return candidates
+    .map((m, i) => ({ ...m, mentionCount: counts[i] }))
+    .sort((a, b) => b.mentionCount - a.mentionCount)
+    .slice(0, limit);
 }
 
 async function getLastActivityDates(): Promise<Map<string, string>> {

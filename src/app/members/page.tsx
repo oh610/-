@@ -3,23 +3,27 @@ import Link from "next/link";
 import {
   searchMembers,
   getDistrictOptions,
+  getPartyOptions,
   getTopActiveMembers,
   getInactiveMembers,
+  getHotMembers,
   formatDistrictName,
 } from "@/lib/supabase/members";
 import { getRecentBills, getHotBills } from "@/lib/supabase/bills";
 import { createClient } from "@/lib/supabase/server";
 import { LoginPromptPopup } from "@/components/LoginPromptPopup";
 import { DistrictFilter } from "@/components/DistrictFilter";
+import { PartyFilter } from "@/components/PartyFilter";
 import { TopActiveMembersPanel } from "@/components/TopActiveMembersPanel";
 import { InactiveMembersPanel } from "@/components/InactiveMembersPanel";
+import { HotMembersTicker } from "@/components/HotMembersTicker";
 import { BillRankPanel } from "@/components/BillRankPanel";
 import { MembersSwipeContainer } from "@/components/MembersSwipeContainer";
 
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "국회의원 활동",
+  title: "국회의원",
   description: "국회의원 프로필, 발의 법안, 표결 이력을 검색해 보세요.",
 };
 
@@ -40,17 +44,20 @@ function IdeologyBadge({ ideology }: { ideology: "진보" | "보수" }) {
 export default async function MembersPage({
   searchParams,
 }: {
-  searchParams: Promise<{ q?: string; region?: string; district?: string }>;
+  searchParams: Promise<{ q?: string; region?: string; district?: string; party?: string }>;
 }) {
-  const { q = "", region, district } = await searchParams;
-  const [members, districtOptions, topActiveMembers, inactiveMembers, recentBills, hotBills] = await Promise.all([
-    searchMembers(q, region, district),
-    getDistrictOptions(),
-    getTopActiveMembers(10, 30),
-    getInactiveMembers(30),
-    getRecentBills(5),
-    getHotBills(5, 15),
-  ]);
+  const { q = "", region, district, party } = await searchParams;
+  const [members, districtOptions, partyOptions, topActiveMembers, inactiveMembers, recentBills, hotBills, hotMembers] =
+    await Promise.all([
+      searchMembers(q, region, district, party),
+      getDistrictOptions(),
+      getPartyOptions(),
+      getTopActiveMembers(10, 30),
+      getInactiveMembers(30),
+      getRecentBills(5),
+      getHotBills(5, 15),
+      getHotMembers(5, 15),
+    ]);
 
   const supabase = await createClient();
   const {
@@ -87,6 +94,8 @@ export default async function MembersPage({
 
         <div className="members-center">
           <div className="members-search flex w-full min-w-0 flex-col gap-6">
+            <HotMembersTicker members={hotMembers} />
+
             <h1 className="text-lg font-medium text-zinc-500 dark:text-zinc-400">국회의원 검색</h1>
 
             <form className="flex gap-2">
@@ -99,12 +108,16 @@ export default async function MembersPage({
               />
               {region && <input type="hidden" name="region" value={region} />}
               {district && <input type="hidden" name="district" value={district} />}
+              {party && <input type="hidden" name="party" value={party} />}
               <button type="submit" className="btn-primary">
                 검색
               </button>
             </form>
 
-            <DistrictFilter districts={districtOptions} />
+            <div className="flex flex-col gap-2">
+              <DistrictFilter districts={districtOptions} />
+              <PartyFilter parties={partyOptions} />
+            </div>
           </div>
 
           <ul className="members-results flex w-full min-w-0 max-w-2xl flex-col gap-3">
