@@ -40,34 +40,62 @@ body {
     @apply inline-flex items-center justify-center rounded-full px-5 py-2.5 text-sm font-medium text-zinc-600 transition hover:bg-zinc-100 dark:text-zinc-400 dark:hover:bg-zinc-900;
   }
 
-  /* 모바일에서는 검색 -> 트렌드 패널 -> 결과 목록 순서로 자연스럽게 쌓이고,
-     데스크톱(1024px~)에서는 기존 3단 레이아웃(법안 | 검색+결과 | 활동 TOP10)을 재현. */
+  /* 모바일(1024px 미만)에서는 검색창과 트렌드 패널이 세로로 쌓이면 화면이 너무 길어지고
+     내부 sticky/카드 레이아웃끼리 겹쳐 보이는 문제가 있어, 3개 화면(법안 | 검색+결과 | 활동)을
+     좌우로 스와이프하는 가로 스크롤 캐러셀로 전환한다. 데스크톱(1024px~)에서는 기존
+     3단 그리드 레이아웃(법안 | 검색+결과 | 활동 TOP10)을 그대로 재현한다. */
   .members-layout {
-    display: grid;
+    display: flex;
+    gap: 0;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  .members-layout::-webkit-scrollbar {
+    display: none;
+  }
+  .members-layout > * {
+    scroll-snap-align: start;
+    flex: 0 0 100%;
+    min-width: 0;
+  }
+
+  .members-center {
+    display: flex;
+    flex-direction: column;
     gap: 1.5rem;
-    grid-template-columns: 1fr;
   }
 
   @media (min-width: 1024px) {
     .members-layout {
+      display: grid;
+      gap: 1.5rem;
       grid-template-columns: 16rem 1fr 16rem;
       align-items: start;
+      overflow: visible;
+      scroll-snap-type: none;
       grid-template-areas:
         "bills search top10"
         "bills results top10";
     }
-  }
-
-  .members-search {
-    grid-area: search;
-  }
-  .members-bills {
-    grid-area: bills;
-  }
-  .members-top10 {
-    grid-area: top10;
-  }
-  .members-results {
-    grid-area: results;
+    .members-layout > * {
+      flex: initial;
+    }
+    .members-center {
+      display: contents;
+    }
+    .members-search {
+      grid-area: search;
+    }
+    .members-results {
+      grid-area: results;
+    }
+    .members-bills {
+      grid-area: bills;
+    }
+    .members-top10 {
+      grid-area: top10;
+    }
   }
 }
