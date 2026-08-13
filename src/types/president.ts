@@ -18,12 +18,19 @@ export type ApprovalRating = {
 
 export type PledgeStatus = "추진 전" | "추진 중" | "이행 완료";
 
+export type PledgeItem = {
+  id: string;
+  content: string;
+  status: PledgeStatus;
+  displayOrder: number;
+};
+
 export type Pledge = {
   id: string;
   title: string;
   category: string | null;
-  description: string | null;
-  status: PledgeStatus;
   sourceUrl: string | null;
   displayOrder: number;
+  items: PledgeItem[];
+  completionPercent: number | null;
 };

@@ -16,6 +16,12 @@ const STATUS_STYLE: Record<PledgeStatus, string> = {
   "이행 완료": "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-400",
 };
 
+function percentStyle(percent: number): string {
+  if (percent >= 80) return "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-400";
+  if (percent >= 30) return "bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-400";
+  return "bg-zinc-200 text-zinc-700 dark:bg-zinc-700 dark:text-zinc-200";
+}
+
 export default async function PresidentPledgesPage() {
   const pledges = await getPledges();
 
@@ -41,17 +47,32 @@ export default async function PresidentPledgesPage() {
                     )}
                     <h2 className="mt-0.5 font-semibold text-zinc-900 dark:text-zinc-50">{p.title}</h2>
                   </div>
-                  <span
-                    className={`shrink-0 rounded-full px-2.5 py-1 text-xs font-semibold ${STATUS_STYLE[p.status]}`}
-                  >
-                    {p.status}
-                  </span>
+                  {p.completionPercent !== null && (
+                    <span
+                      className={`shrink-0 rounded-full px-2.5 py-1 text-xs font-semibold ${percentStyle(p.completionPercent)}`}
+                    >
+                      이행 {p.completionPercent}%
+                    </span>
+                  )}
                 </div>
-                {p.description && (
-                  <p className="mt-3 text-[15px] leading-relaxed text-zinc-600 dark:text-zinc-400">
-                    {p.description}
-                  </p>
+
+                {p.items.length > 0 && (
+                  <ul className="mt-3 flex flex-col divide-y divide-zinc-100 border-t border-zinc-100 dark:divide-zinc-900 dark:border-zinc-900">
+                    {p.items.map((item) => (
+                      <li key={item.id} className="flex items-center justify-between gap-3 py-2.5">
+                        <span className="min-w-0 flex-1 text-sm leading-relaxed text-zinc-600 dark:text-zinc-400">
+                          {item.content}
+                        </span>
+                        <span
+                          className={`shrink-0 whitespace-nowrap rounded-full px-2 py-0.5 text-[11px] font-medium ${STATUS_STYLE[item.status]}`}
+                        >
+                          {item.status}
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
                 )}
+
                 {p.sourceUrl && (
                   <a
                     href={p.sourceUrl}

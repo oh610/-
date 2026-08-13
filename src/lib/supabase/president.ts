@@ -1,5 +1,7 @@
 import { supabase } from "@/lib/supabase/client";
-import type { ApprovalRating, Pledge, PresidentProfile } from "@/types/president";
+import type { ApprovalRating, Pledge, PledgeStatus, PresidentProfile } from "@/types/president";
+
+const STATUS_WEIGHT: Record<PledgeStatus, number> = { "추진 전": 0, "추진 중": 50, "이행 완료": 100 };
 
 export const PRESIDENT_PROFILE_ID = "00000000-0000-0000-0000-000000000001";
 
@@ -49,23 +51,47 @@ export async function getApprovalRatings(limit = 26): Promise<ApprovalRating[]> 
 }
 
 export async function getPledges(): Promise<Pledge[]> {
-  const { data, error } = await supabase
-    .from("pledges")
-    .select("id, title, category, description, status, source_url, display_order")
-    .order("display_order", { ascending: true });
+  const [pledgesRes, itemsRes] = await Promise.all([
+    supabase
+      .from("pledges")
+      .select("id, title, category, source_url, display_order")
+      .order("display_order", { ascending: true }),
+    supabase
+      .from("pledge_items")
+      .select("id, pledge_id, content, status, display_order")
+      .order("display_order", { ascending: true }),
+  ]);
 
-  if (error) {
-    console.error("[getPledges]", error);
+  if (pledgesRes.error) {
+    console.error("[getPledges]", pledgesRes.error);
     return [];
   }
+  if (itemsRes.error) {
+    console.error("[getPledges] items", itemsRes.error);
+  }
 
-  return (data ?? []).map((p) => ({
-    id: p.id,
-    title: p.title,
-    category: p.category,
-    description: p.description,
-    status: p.status,
-    sourceUrl: p.source_url,
-    displayOrder: p.display_order,
-  }));
+  const itemsByPledge = new Map<string, Pledge["items"]>();
+  for (const item of itemsRes.data ?? []) {
+    const list = itemsByPledge.get(item.pledge_id) ?? [];
+    list.push({ id: item.id, content: item.content, status: item.status, displayOrder: item.display_order });
+    itemsByPledge.set(item.pledge_id, list);
+  }
+
+  return (pledgesRes.data ?? []).map((p) => {
+    const items = itemsByPledge.get(p.id) ?? [];
+    const completionPercent =
+      items.length === 0
+        ? null
+        : Math.round(items.reduce((sum, i) => sum + STATUS_WEIGHT[i.status], 0) / items.length);
+
+    return {
+      id: p.id,
+      title: p.title,
+      category: p.category,
+      sourceUrl: p.source_url,
+      displayOrder: p.display_order,
+      items,
+      completionPercent,
+    };
+  });
 }
