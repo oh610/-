@@ -41,6 +41,29 @@ export async function addPledge(formData: FormData) {
   revalidatePledgePages();
 }
 
+export async function updatePledge(formData: FormData) {
+  await requireAdmin();
+  const id = formData.get("id") as string;
+  const title = (formData.get("title") as string)?.trim();
+  const category = (formData.get("category") as string)?.trim();
+  const sourceUrl = (formData.get("sourceUrl") as string)?.trim();
+  const displayOrder = Number(formData.get("displayOrder")) || 0;
+  if (!id || !title) return;
+
+  const { error } = await supabaseAdmin
+    .from("pledges")
+    .update({
+      title,
+      category: category || null,
+      source_url: sourceUrl || null,
+      display_order: displayOrder,
+    })
+    .eq("id", id);
+  if (error) throw error;
+
+  revalidatePledgePages();
+}
+
 export async function deletePledge(formData: FormData) {
   await requireAdmin();
   const id = formData.get("id") as string;
@@ -75,15 +98,16 @@ export async function addPledgeItem(formData: FormData) {
   revalidatePledgePages();
 }
 
-export async function updatePledgeItemStatus(formData: FormData) {
+export async function updatePledgeItem(formData: FormData) {
   await requireAdmin();
   const id = formData.get("id") as string;
+  const content = (formData.get("content") as string)?.trim();
   const status = formData.get("status") as string;
-  if (!id || !STATUSES.includes(status)) return;
+  if (!id || !content || !STATUSES.includes(status)) return;
 
   const { error } = await supabaseAdmin
     .from("pledge_items")
-    .update({ status, updated_at: new Date().toISOString() })
+    .update({ content, status, updated_at: new Date().toISOString() })
     .eq("id", id);
   if (error) throw error;
 

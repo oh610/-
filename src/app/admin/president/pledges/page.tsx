@@ -1,10 +1,22 @@
 import Link from "next/link";
 import { supabaseAdmin } from "@/lib/supabase/admin";
-import { addPledge, deletePledge, addPledgeItem, updatePledgeItemStatus, deletePledgeItem } from "./actions";
+import {
+  addPledge,
+  updatePledge,
+  deletePledge,
+  addPledgeItem,
+  updatePledgeItem,
+  deletePledgeItem,
+} from "./actions";
 
 export const dynamic = "force-dynamic";
 
 const STATUSES = ["추진 전", "추진 중", "이행 완료"] as const;
+
+const inputClass =
+  "rounded-lg border border-zinc-300 px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-900";
+const smallBtnClass =
+  "shrink-0 rounded border border-zinc-300 px-2 py-1 text-xs hover:bg-zinc-100 dark:border-zinc-700 dark:hover:bg-zinc-800";
 
 export default async function AdminPresidentPledgesPage() {
   const [{ data: pledges }, { data: items }] = await Promise.all([
@@ -43,39 +55,20 @@ export default async function AdminPresidentPledgesPage() {
         <div className="flex flex-wrap gap-3">
           <label className="flex min-w-[200px] flex-1 flex-col gap-1 text-xs">
             공약명
-            <input
-              type="text"
-              name="title"
-              required
-              className="rounded-lg border border-zinc-300 px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-900"
-            />
+            <input type="text" name="title" required className={inputClass} />
           </label>
           <label className="flex w-32 flex-col gap-1 text-xs">
             분야
-            <input
-              type="text"
-              name="category"
-              placeholder="예: 경제"
-              className="rounded-lg border border-zinc-300 px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-900"
-            />
+            <input type="text" name="category" placeholder="예: 경제" className={inputClass} />
           </label>
           <label className="flex w-24 flex-col gap-1 text-xs">
             순서
-            <input
-              type="number"
-              name="displayOrder"
-              defaultValue={0}
-              className="rounded-lg border border-zinc-300 px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-900"
-            />
+            <input type="number" name="displayOrder" defaultValue={0} className={inputClass} />
           </label>
         </div>
         <label className="flex flex-col gap-1 text-xs">
           출처 URL
-          <input
-            type="url"
-            name="sourceUrl"
-            className="rounded-lg border border-zinc-300 px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-900"
-          />
+          <input type="url" name="sourceUrl" className={inputClass} />
         </label>
         <button type="submit" className="btn-primary self-start">
           추가
@@ -90,17 +83,38 @@ export default async function AdminPresidentPledgesPage() {
               key={p.id}
               className="rounded-2xl border border-zinc-200 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-950"
             >
-              <div className="flex items-start justify-between gap-3">
-                <div className="min-w-0">
-                  {p.category && <p className="text-xs text-zinc-400">{p.category}</p>}
-                  <p className="font-semibold text-zinc-900 dark:text-zinc-50">{p.title}</p>
-                </div>
+              <form action={updatePledge} className="flex flex-wrap items-end gap-2">
+                <input type="hidden" name="id" value={p.id} />
+                <label className="flex w-28 flex-col gap-1 text-xs">
+                  분야
+                  <input type="text" name="category" defaultValue={p.category ?? ""} className={inputClass} />
+                </label>
+                <label className="flex min-w-[200px] flex-1 flex-col gap-1 text-xs">
+                  공약명
+                  <input type="text" name="title" defaultValue={p.title} required className={inputClass} />
+                </label>
+                <label className="flex w-20 flex-col gap-1 text-xs">
+                  순서
+                  <input
+                    type="number"
+                    name="displayOrder"
+                    defaultValue={p.display_order}
+                    className={inputClass}
+                  />
+                </label>
+                <label className="flex min-w-[160px] flex-1 flex-col gap-1 text-xs">
+                  출처 URL
+                  <input type="url" name="sourceUrl" defaultValue={p.source_url ?? ""} className={inputClass} />
+                </label>
+                <button type="submit" className={smallBtnClass}>
+                  공약 수정
+                </button>
+              </form>
+
+              <div className="mt-2 flex justify-end">
                 <form action={deletePledge}>
                   <input type="hidden" name="id" value={p.id} />
-                  <button
-                    type="submit"
-                    className="shrink-0 rounded border border-zinc-300 px-2 py-1 text-xs hover:bg-zinc-100 dark:border-zinc-700 dark:hover:bg-zinc-800"
-                  >
+                  <button type="submit" className={smallBtnClass}>
                     공약 삭제
                   </button>
                 </form>
@@ -109,33 +123,29 @@ export default async function AdminPresidentPledgesPage() {
               <ul className="mt-3 flex flex-col gap-2 border-t border-zinc-100 pt-3 dark:border-zinc-900">
                 {pledgeItems.map((item) => (
                   <li key={item.id} className="flex flex-wrap items-center gap-2 text-sm">
-                    <span className="min-w-0 flex-1 text-zinc-700 dark:text-zinc-300">{item.content}</span>
-                    <form action={updatePledgeItemStatus} className="flex items-center gap-1">
+                    <form action={updatePledgeItem} className="flex min-w-0 flex-1 flex-wrap items-center gap-2">
                       <input type="hidden" name="id" value={item.id} />
-                      <select
-                        name="status"
-                        defaultValue={item.status}
-                        className="rounded-lg border border-zinc-300 px-2 py-1 text-xs dark:border-zinc-700 dark:bg-zinc-900"
-                      >
+                      <input
+                        type="text"
+                        name="content"
+                        defaultValue={item.content}
+                        required
+                        className={`min-w-[200px] flex-1 ${inputClass}`}
+                      />
+                      <select name="status" defaultValue={item.status} className={inputClass}>
                         {STATUSES.map((s) => (
                           <option key={s} value={s}>
                             {s}
                           </option>
                         ))}
                       </select>
-                      <button
-                        type="submit"
-                        className="rounded border border-zinc-300 px-2 py-1 text-xs hover:bg-zinc-100 dark:border-zinc-700 dark:hover:bg-zinc-800"
-                      >
-                        변경
+                      <button type="submit" className={smallBtnClass}>
+                        수정
                       </button>
                     </form>
                     <form action={deletePledgeItem}>
                       <input type="hidden" name="id" value={item.id} />
-                      <button
-                        type="submit"
-                        className="rounded border border-zinc-300 px-2 py-1 text-xs hover:bg-zinc-100 dark:border-zinc-700 dark:hover:bg-zinc-800"
-                      >
+                      <button type="submit" className={smallBtnClass}>
                         삭제
                       </button>
                     </form>
@@ -153,23 +163,16 @@ export default async function AdminPresidentPledgesPage() {
                   name="content"
                   placeholder="세부 공약 내용"
                   required
-                  className="min-w-[200px] flex-1 rounded-lg border border-zinc-300 px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-900"
+                  className={`min-w-[200px] flex-1 ${inputClass}`}
                 />
-                <select
-                  name="status"
-                  defaultValue="추진 전"
-                  className="rounded-lg border border-zinc-300 px-2 py-2 text-xs dark:border-zinc-700 dark:bg-zinc-900"
-                >
+                <select name="status" defaultValue="추진 전" className={inputClass}>
                   {STATUSES.map((s) => (
                     <option key={s} value={s}>
                       {s}
                     </option>
                   ))}
                 </select>
-                <button
-                  type="submit"
-                  className="rounded-lg border border-zinc-300 px-3 py-2 text-xs hover:bg-zinc-100 dark:border-zinc-700 dark:hover:bg-zinc-800"
-                >
+                <button type="submit" className={smallBtnClass}>
                   세부 공약 추가
                 </button>
               </form>
