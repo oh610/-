@@ -80,6 +80,7 @@ export async function addPledgeItem(formData: FormData) {
   const pledgeId = formData.get("pledgeId") as string;
   const content = (formData.get("content") as string)?.trim();
   const status = (formData.get("status") as string) || "추진 전";
+  const sourceUrl = (formData.get("sourceUrl") as string)?.trim();
   if (!pledgeId || !content || !STATUSES.includes(status)) return;
 
   const { count } = await supabaseAdmin
@@ -91,6 +92,7 @@ export async function addPledgeItem(formData: FormData) {
     pledge_id: pledgeId,
     content,
     status,
+    source_url: sourceUrl || null,
     display_order: count ?? 0,
   });
   if (error) throw error;
@@ -103,11 +105,12 @@ export async function updatePledgeItem(formData: FormData) {
   const id = formData.get("id") as string;
   const content = (formData.get("content") as string)?.trim();
   const status = formData.get("status") as string;
+  const sourceUrl = (formData.get("sourceUrl") as string)?.trim();
   if (!id || !content || !STATUSES.includes(status)) return;
 
   const { error } = await supabaseAdmin
     .from("pledge_items")
-    .update({ content, status, updated_at: new Date().toISOString() })
+    .update({ content, status, source_url: sourceUrl || null, updated_at: new Date().toISOString() })
     .eq("id", id);
   if (error) throw error;
 

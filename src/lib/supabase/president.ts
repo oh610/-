@@ -84,7 +84,7 @@ export async function getApprovalRatingsPage(
 export async function getPledgeItemDetail(id: string): Promise<PledgeItemDetail | null> {
   const { data, error } = await supabase
     .from("pledge_items")
-    .select("id, content, status, pledge_id, pledges(title, category)")
+    .select("id, content, status, source_url, pledge_id, pledges(title, category)")
     .eq("id", id)
     .maybeSingle();
 
@@ -108,6 +108,7 @@ export async function getPledgeItemDetail(id: string): Promise<PledgeItemDetail 
     id: data.id,
     content: data.content,
     status: data.status,
+    sourceUrl: data.source_url,
     pledgeId: data.pledge_id,
     pledgeTitle: pledge.title,
     category: pledge.category,
@@ -123,7 +124,7 @@ export async function getPledges(query = ""): Promise<Pledge[]> {
       .order("display_order", { ascending: true }),
     supabase
       .from("pledge_items")
-      .select("id, pledge_id, content, status, display_order")
+      .select("id, pledge_id, content, status, source_url, display_order")
       .order("display_order", { ascending: true }),
   ]);
 
@@ -138,7 +139,13 @@ export async function getPledges(query = ""): Promise<Pledge[]> {
   const itemsByPledge = new Map<string, Pledge["items"]>();
   for (const item of itemsRes.data ?? []) {
     const list = itemsByPledge.get(item.pledge_id) ?? [];
-    list.push({ id: item.id, content: item.content, status: item.status, displayOrder: item.display_order });
+    list.push({
+      id: item.id,
+      content: item.content,
+      status: item.status,
+      sourceUrl: item.source_url,
+      displayOrder: item.display_order,
+    });
     itemsByPledge.set(item.pledge_id, list);
   }
 

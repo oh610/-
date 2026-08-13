@@ -22,6 +22,7 @@ export type PledgeItem = {
   id: string;
   content: string;
   status: PledgeStatus;
+  sourceUrl: string | null;
   displayOrder: number;
 };
 
@@ -46,6 +47,7 @@ export type PledgeItemDetail = {
   id: string;
   content: string;
   status: PledgeStatus;
+  sourceUrl: string | null;
   pledgeId: string;
   pledgeTitle: string;
   category: string | null;

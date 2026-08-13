@@ -91,6 +91,20 @@ export default async function PledgeItemDetailPage({
             </ul>
           )}
         </section>
+
+        {item.sourceUrl && (
+          <section className="rounded-2xl border border-zinc-200 bg-white p-6 dark:border-zinc-800 dark:bg-zinc-950">
+            <h2 className="mb-3 text-sm font-semibold text-zinc-500 dark:text-zinc-400">출처</h2>
+            <a
+              href={item.sourceUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="break-all text-sm text-violet-600 hover:underline dark:text-violet-400"
+            >
+              {item.sourceUrl}
+            </a>
+          </section>
+        )}
       </main>
     </div>
   );

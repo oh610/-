@@ -26,7 +26,7 @@ export default async function AdminPresidentPledgesPage() {
       .order("display_order", { ascending: true }),
     supabaseAdmin
       .from("pledge_items")
-      .select("id, pledge_id, content, status, display_order")
+      .select("id, pledge_id, content, status, source_url, display_order")
       .order("display_order", { ascending: true }),
   ]);
 
@@ -132,6 +132,13 @@ export default async function AdminPresidentPledgesPage() {
                         required
                         className={`min-w-[200px] flex-1 ${inputClass}`}
                       />
+                      <input
+                        type="url"
+                        name="sourceUrl"
+                        defaultValue={item.source_url ?? ""}
+                        placeholder="세부 공약 출처 URL"
+                        className={`min-w-[160px] flex-1 ${inputClass}`}
+                      />
                       <select name="status" defaultValue={item.status} className={inputClass}>
                         {STATUSES.map((s) => (
                           <option key={s} value={s}>
@@ -164,6 +171,12 @@ export default async function AdminPresidentPledgesPage() {
                   placeholder="세부 공약 내용"
                   required
                   className={`min-w-[200px] flex-1 ${inputClass}`}
+                />
+                <input
+                  type="url"
+                  name="sourceUrl"
+                  placeholder="세부 공약 출처 URL"
+                  className={`min-w-[160px] flex-1 ${inputClass}`}
                 />
                 <select name="status" defaultValue="추진 전" className={inputClass}>
                   {STATUSES.map((s) => (
