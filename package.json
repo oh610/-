@@ -10,6 +10,7 @@
     "sync:members": "tsx scripts/sync-members.ts",
     "collect:news": "tsx scripts/collect-news.ts",
     "sync:bills": "tsx scripts/sync-bills.ts",
+    "sync:member-mentions": "tsx scripts/sync-member-mentions.ts",
     "generate:summary": "tsx scripts/generate-summary.ts"
   },
   "dependencies": {

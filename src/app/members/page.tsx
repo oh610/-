@@ -56,7 +56,7 @@ export default async function MembersPage({
       getInactiveMembers(30),
       getRecentBills(5),
       getHotBills(5, 15),
-      getHotMembers(5, 15),
+      getHotMembers(5),
     ]);
 
   const supabase = await createClient();

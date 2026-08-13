@@ -13,32 +13,20 @@ export function HotMembersTicker({ members }: { members: HotMember[] }) {
         </h2>
         <InfoTooltip
           label="실시간 언론 언급 TOP 5 기준 설명"
-          text="최근 30일간 활동이 많은 의원 중 네이버 뉴스 언급 건수가 많은 순으로 5명을 보여줘요. 언급 건수는 페이지를 열 때마다 실시간으로 조회돼요."
+          text="활동 여부와 관계없이 전체 국회의원 중 네이버 뉴스 언급 건수가 많은 순으로 5명을 보여줘요. 언급 건수는 매일 자동으로 갱신돼요."
         />
       </div>
-      <ol className="flex gap-3 overflow-x-auto pb-1">
+      <ol className="grid grid-cols-5 gap-1.5">
         {members.map((m, i) => (
-          <li key={m.id} className="shrink-0">
+          <li key={m.id} className="min-w-0">
             <Link
               href={`/members/${m.id}`}
-              className="flex w-24 flex-col items-center gap-1.5 rounded-xl p-2 text-center transition hover:bg-zinc-50 dark:hover:bg-zinc-900"
+              className="flex flex-col items-center gap-1 rounded-xl px-1 py-2.5 text-center transition hover:bg-zinc-50 dark:hover:bg-zinc-900"
             >
               <span className="text-xs font-bold text-violet-500">{i + 1}</span>
-              {m.photoUrl ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
-                  src={m.photoUrl}
-                  alt={`${m.name} 의원 사진`}
-                  className="h-14 w-14 rounded-full object-cover"
-                />
-              ) : (
-                <div className="flex h-14 w-14 items-center justify-center rounded-full bg-zinc-100 text-lg font-semibold text-zinc-400 dark:bg-zinc-800 dark:text-zinc-600">
-                  {m.name.slice(0, 1)}
-                </div>
-              )}
-              <p className="w-full truncate text-xs font-medium text-zinc-900 dark:text-zinc-50">{m.name}</p>
+              <p className="w-full truncate text-sm font-medium text-zinc-900 dark:text-zinc-50">{m.name}</p>
               <p className="w-full truncate text-[11px] text-zinc-500 dark:text-zinc-400">
-                언급 {m.mentionCount.toLocaleString()}건
+                {m.mentionCount.toLocaleString()}건
               </p>
             </Link>
           </li>

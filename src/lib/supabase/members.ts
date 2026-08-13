@@ -1,5 +1,4 @@
 import { supabase } from "@/lib/supabase/client";
-import { getNewsMentionCount } from "@/lib/collectors/naver-news";
 import type { MemberBill, MemberDetail, MemberListItem, MemberVote } from "@/types/member";
 
 type PartyRef = { name: string; ideology: "진보" | "보수" } | { name: string; ideology: "진보" | "보수" }[] | null;
@@ -204,27 +203,49 @@ export async function getTopActiveMembers(limit = 10, days = 30): Promise<TopAct
   return resolveActiveMembers(topIds, countByMember);
 }
 
-export type HotMember = TopActiveMember & { mentionCount: number };
+export type HotMember = {
+  id: string;
+  name: string;
+  partyName: string | null;
+  ideology: "진보" | "보수" | null;
+  mentionCount: number;
+};
 
-// 최근 30일 활동이 있는 의원 중에서 언론 언급량이 많은 순으로 뽑는다. 네이버 검색 API를
-// 후보 인원 수만큼 호출하므로 poolSize를 과도하게 키우지 않는다.
-export async function getHotMembers(limit = 5, poolSize = 15): Promise<HotMember[]> {
-  const candidates = await getTopActiveMembers(poolSize, 30);
-  if (candidates.length === 0) return [];
+type MentionRow = {
+  mention_count: number;
+  members: { id: string; name: string; parties: PartyRef } | { id: string; name: string; parties: PartyRef }[] | null;
+};
 
-  const counts = await Promise.all(
-    candidates.map((m) =>
-      getNewsMentionCount(`${m.name} 의원`).catch((err) => {
-        console.error("[getHotMembers] 언급량 조회 실패", m.name, err);
-        return 0;
-      }),
-    ),
-  );
+// 활동량과 무관하게 전체 의원 중 언론 언급량이 많은 순으로 뽑는다. 300명 전체를 매 요청마다
+// 네이버 API로 조회하면 호출량이 너무 많아지므로, member_mention_counts에 매일 크론이
+// 미리 계산해둔 값을 읽기만 한다. (src/lib/pipeline/sync-member-mentions.ts)
+export async function getHotMembers(limit = 5): Promise<HotMember[]> {
+  const { data, error } = await supabase
+    .from("member_mention_counts")
+    .select("mention_count, members(id, name, parties(name, ideology))")
+    .order("mention_count", { ascending: false })
+    .limit(limit);
 
-  return candidates
-    .map((m, i) => ({ ...m, mentionCount: counts[i] }))
-    .sort((a, b) => b.mentionCount - a.mentionCount)
-    .slice(0, limit);
+  if (error) {
+    console.error("[getHotMembers]", error);
+    return [];
+  }
+
+  return ((data ?? []) as unknown as MentionRow[])
+    .map((row) => {
+      const m = Array.isArray(row.members) ? row.members[0] : row.members;
+      if (!m) return null;
+      const party = toParty(m.parties);
+      const result: HotMember = {
+        id: m.id,
+        name: m.name,
+        partyName: party?.name ?? null,
+        ideology: party?.ideology ?? null,
+        mentionCount: row.mention_count,
+      };
+      return result;
+    })
+    .filter((m): m is HotMember => m !== null);
 }
 
 async function getLastActivityDates(): Promise<Map<string, string>> {
