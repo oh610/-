@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState, type ReactNode } from "react";
+import { useRef, useState, type PointerEvent, type ReactNode } from "react";
 import { SummaryCardView } from "@/components/SummaryCard";
 import type { SummaryCard } from "@/types/summary-card";
 
@@ -47,9 +47,31 @@ export function DailyCardSlider({
   pastCards?: SummaryCard[];
 }) {
   const [index, setIndex] = useState(0); // 0 오늘, 음수 과거(최근일수록 -1에 가까움), 1 내일
+  const swipeStart = useRef<{ x: number; y: number } | null>(null);
 
   const minIndex = -(pastCards.length + 1);
   const maxIndex = 1;
+
+  const SWIPE_THRESHOLD = 50;
+
+  function handlePointerDown(e: PointerEvent<HTMLDivElement>) {
+    swipeStart.current = { x: e.clientX, y: e.clientY };
+  }
+
+  function handlePointerUp(e: PointerEvent<HTMLDivElement>) {
+    if (!swipeStart.current) return;
+    const dx = e.clientX - swipeStart.current.x;
+    const dy = e.clientY - swipeStart.current.y;
+    swipeStart.current = null;
+
+    if (Math.abs(dx) < SWIPE_THRESHOLD || Math.abs(dx) < Math.abs(dy) * 1.5) return;
+
+    if (dx < 0) {
+      setIndex((i) => Math.min(maxIndex, i + 1));
+    } else {
+      setIndex((i) => Math.max(minIndex, i - 1));
+    }
+  }
   const oldestFirstPastCards = [...pastCards].reverse();
 
   const slides: ReactNode[] = [
@@ -107,7 +129,11 @@ export function DailyCardSlider({
           ‹
         </button>
 
-        <div className="w-full overflow-hidden">
+        <div
+          className="w-full overflow-hidden touch-pan-y"
+          onPointerDown={handlePointerDown}
+          onPointerUp={handlePointerUp}
+        >
           <div
             className="flex transition-transform duration-500 ease-out"
             style={{ transform: `translateX(${-position * 100}%)` }}

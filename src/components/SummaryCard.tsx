@@ -1,5 +1,8 @@
 import Link from "next/link";
 import type { SummaryCard, SummaryCardCitation } from "@/types/summary-card";
+import { ShareButton } from "@/components/ShareButton";
+
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://polispoon.vercel.app";
 
 const SOURCE_TYPE_LABEL: Record<SummaryCardCitation["sourceType"], string> = {
   press_release: "공식 논평",
@@ -97,15 +100,22 @@ export function SummaryCardView({ card }: { card: SummaryCard }) {
     <article className="w-full max-w-2xl rounded-2xl border border-zinc-200 bg-white p-7 shadow-sm transition hover:shadow-md sm:p-8 dark:border-zinc-800 dark:bg-zinc-950">
       <div className="flex items-center justify-between text-sm text-zinc-500 dark:text-zinc-400">
         <span>{card.publishedDate}</span>
-        <span
-          className={
-            card.biasCheckPassed
-              ? "rounded-full bg-emerald-100 px-2 py-0.5 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-400"
-              : "rounded-full bg-amber-100 px-2 py-0.5 text-amber-700 dark:bg-amber-900/40 dark:text-amber-400"
-          }
-        >
-          {card.biasCheckPassed ? "편향 검증 통과" : "편향 검증 대기"}
-        </span>
+        <div className="flex items-center gap-2">
+          <span
+            className={
+              card.biasCheckPassed
+                ? "rounded-full bg-emerald-100 px-2 py-0.5 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-400"
+                : "rounded-full bg-amber-100 px-2 py-0.5 text-amber-700 dark:bg-amber-900/40 dark:text-amber-400"
+            }
+          >
+            {card.biasCheckPassed ? "편향 검증 통과" : "편향 검증 대기"}
+          </span>
+          <ShareButton
+            title={card.issueTitle}
+            text={`${card.issueTitle} - 여당·야당 입장을 나란히 비교해 보세요.`}
+            url={`${SITE_URL}/archive/${card.id}`}
+          />
+        </div>
       </div>
 
       <h1 className="mt-4 text-2xl font-bold leading-snug text-zinc-950 dark:text-zinc-50">
